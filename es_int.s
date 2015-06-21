@@ -53,12 +53,12 @@ finPA:          DS.B    4       * Direccion de buffPA
 finPB:          DS.B    4       * Direccion de buffPB
 emptySA:        DS.B	1		* Bit para comprobar si está vacío SA
 emptySB:        DS.B	1		* Bit para comprobar si está vacío SB
-fullPA:       DS.B	1		* Bit para comprobar si está lleno PA
-fullPB:       DS.B	1		* Bit para comprobar si está lleno PB
+fullPA:         DS.B	1		* Bit para comprobar si está lleno PA
+fullPB:         DS.B	1		* Bit para comprobar si está lleno PB
 
-RET_TBA:	DS.B	1		* Bit para comprobar si hay que escribir un 0A en la RTI
-RET_TBB:	DS.B	1		* Bit para comprobar si hay que escribir un 0A en la RTI
-IMRcopia:		DS.B	2		* Copia de la máscara de interrupción
+LIN_TBA:	DS.B	1		* Hay salto de linea en transmision A
+LIN_TBB:	DS.B	1		* Hay salto de linea en transmision B
+IMRcopia:	DS.B	2		* Copia de la máscara de interrupción
 
 ***************************
 
@@ -636,68 +636,84 @@ RTI:
 		BRA			RTI_FIN			* Si no esta activo ninguno saltar a RTI_FIN
 
 T_RDY_A:
-        MOVE.B		emptySA,D2
-		CMP.B		#0,D2
-		BEQ		TLIN_A
-		MOVE.L		#0,D0			* D0 = 0
-		BSET		#1,D0			* BIT 0 = 0, BIT 1 = 1; 
+        MOVE.B		LIN_TBA,D2
+		CMP.B		#1,D2
+		BNE         TR_A
+        MOVE.B      #10,TBA
+        MOVE.B      #0,LIN_TBA
+        BRA         RTI_FIN
+
+TR_A:
+        MOVE.L		#2,D0			* D0 = 0
+        BSR         LINEA
+        CMP.L       #0,DO
+        BEQ         FIN_TA
+		MOVE.L		#2,D0			* BIT 0 = 0, BIT 1 = 1;
 		BSR 		LEECAR			* Salto a leecar.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ 		FIN_TA			* Si error fin.
 		MOVE.B		D0,TBA			* Introducimos el caracter en la linea A de transmisión.	
-		CMP.B 		#$0D,D0
-		BEQ 		TLIN_A
+		CMP.B 		#13,D0
+        BNE         RTI_FIN
+        MOVE.B      #1,LIN_TBA
 		BRA 		RTI_FIN			* Si son iguales hemos terminado
 
 FIN_TA:        	
-		BCLR.B		#0,IMRcopia		* Deshabilitamos interrupciones en la linea A
+        MOVE.W		#$2700,SR		* Si no hay más caracteres inhibo interrupciones
+        BCLR.B		#0,IMRcopia		* Deshabilitamos interrupciones en la linea A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
-		MOVE.L		#0,D0			* Limpiamos D0 al volver de vacio
+        MOVE.W		#$2000,SR		* Permito de nuevo las interrupciones
 		BRA			RTI_FIN			* Saltamos al final de la rti
 		
 T_RDY_B:
-        MOVE.B		emptySB,D2
-		CMP.B		#0,D2
-		BEQ         TLIN_B
-		MOVE.L		#0,D0			* D0 = 0
-		BSET		#1,D0			* BIT 0 = 1, BIT 1 = 1
-		BSET 		#0,D0			*	
-		BSR 		LEECAR			* Salto a LEECAR
+        MOVE.B		LIN_TBB,D2
+		CMP.B		#1,D2
+		BNE         TR_B
+        MOVE.B      #10,TBB
+        MOVE.B      #0,LIN_TBB
+        BRA         RTI_FIN
+
+TR_B:
+        MOVE.L		#3,D0			* D0 = 0
+        BSR         LINEA
+        CMP.L       #0,DO
+        BEQ         FIN_TB
+		MOVE.L		#3,D0			* BIT 0 = 0, BIT 1 = 1;
+		BSR 		LEECAR			* Salto a leecar.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
-		BEQ         FIN_TB			* Si error, fin.
-		MOVE.B 		D0,TBB			* Introducimos el caracter en la linea B de transmisión.
-		CMP.B 		#$0D,D0
-		BEQ 		TLIN_B
-		BRA 		RTI_FIN			*
+		BEQ 		FIN_TB			* Si error fin.
+		MOVE.B		D0,TBB			* Introducimos el caracter en la linea A de transmisión.
+		CMP.B 		#13,D0
+        BNE         RTI_FIN
+        MOVE.B      #1,LIN_TBB
+		BRA 		RTI_FIN			* Si son iguales hemos terminado
 		
 FIN_TB:       
-		BCLR.B		#4,IMRcopia		* Deshabilitamos interrupciones en la linea A
+        MOVE.W		#$2700,SR		* Si no hay más caracteres inhibo interrupciones
+        BCLR.B		#4,IMRcopia		* Deshabilitamos interrupciones en la linea A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
-		MOVE.L		#0,D0			* Limpiamos D0 al volver de D0
+        MOVE.W		#$2000,SR		* Permito de nuevo las interrupciones
 		BRA			RTI_FIN			* Saltamos al final de la rti
 
 R_RDY_A:
-		MOVE.L		#0,D1			* D1 = 0, para cargar el car a leer en un reg vacio.
 		MOVE.B		RBA,D1			* Cogemos el caracter del puerto de recepción
 		MOVE.L		#0,D0			* D0 = 0
 		BSR			ESCCAR			* Vamos a rutina ESCCAR
+        CMP.L       #0,D0
+        BEQ         RTI_FIN
+        MOVE.B      #0,emptySA
 		BRA			RTI_FIN			* Si error, fin.
 
 
 R_RDY_B:
-		MOVE.L		#0,D1			* D1 = 0, para cargar el car a leer en un reg vacio.
 		MOVE.B		RBB,D1			* Cogemos el caracter del puerto de recepción
-		MOVE.W		#0,D0			* Reseteamos D0
-		BSET		#0,D0			* BIT 0 = 1
+		MOVE.B      #1,D0
 		BSR		ESCCAR			* Vamos a rutina ESCCAR
-		BRA		RTI_FIN			* si error fin.
+        CMP.L       #0,D0
+        BEQ         RTI_FIN
+        MOVE.B      #0,emptySB
+        BRA		RTI_FIN			* si error fin.
 
-RCA_RTI:	MOVE.B 		#0,emptySA
-		BRA 		RTI_FIN
-
-
-RCB_RTI		MOVE.B 		#0,emptySB
-		BRA 		RTI_FIN
 
 TLIN_A:		MOVE.B 		#1,emptySA	
 		MOVE.B		#10,TBA
