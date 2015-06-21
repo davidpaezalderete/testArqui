@@ -534,7 +534,7 @@ LINA_RFIN:
         BEQ         LI_FIN          * Si lo es, se sale.
         CMP.L       A1,A2           * si no se comprueban los punteros
         BNE         LINA_RN         * si no son iguales se sigue leyendo.
-        MOVE.L      #0,DO           * Si lo son, se pone 0 en D0
+        MOVE.L      #0,D0           * Si lo son, se pone 0 en D0
         BRA         LI_FIN          * Salida
 
 LINA_T:
@@ -593,7 +593,7 @@ LINB_RFIN:
         BEQ         LI_FIN          * Si lo es, se sale.
         CMP.L       A1,A2           * si no se comprueban los punteros
         BNE         LINB_RN         * si no son iguales se sigue leyendo.
-        MOVE.L      #0,DO           * Si lo son, se pone 0 en D0
+        MOVE.L      #0,D0           * Si lo son, se pone 0 en D0
         BRA         LI_FIN          * Salida
 
 LINB_T:
