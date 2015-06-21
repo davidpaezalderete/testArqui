@@ -413,58 +413,58 @@ SCAN_FIN:
  
 
 PRINT:  LINK		A6,#0
-		MOVE.L		8(A6),A1		* Dirección del buffer.
-		MOVE.W		12(A6),D1		* Descriptor --> D1
-		MOVE.W		14(A6),D2		* Tamaño --> D2
-		MOVE.L		#0,D4			* Inicialización D4 = 0
-		MOVE.L		#0,D0			* Limpio D0
-		CMP.W		#0,D2			* Si tamaño = 0
+		MOVE.L		8(A6),A4		* Dirección del buffer.
+		MOVE.W		12(A6),D3		* Descriptor --> D3
+		MOVE.W		14(A6),D4		* Tamaño --> D4
+		MOVE.L		#0,D5			* Inicialización D4 = 0
+		CMP.L		#0,D2			* Si tamaño = 0
 		BEQ			PRINT_FIN
-		*BSR 		LINEA
-		*CMP.L 		#0,D0
-		*BEQ 		PRINT_FIN
-		*MOVE.L 		D0,D2	
-		CMP.W		#0,D1
+		CMP.W		#0,D3
 		BEQ			PRINT_A			* Si descriptor = 0 escribe en A
-		CMP.W		#1,D1
+		CMP.W		#1,D3
 		BEQ			PRINT_B			* Si descriptor = 1 escribe en B
 		MOVE.L		#$FFFFFFFF,D0	* Si no ERROR,
 		BRA			PRINT_FIN		* y sale de PRINT.
 		
 PRINT_A:
-		CMP.L		D2,D4			* Comprobamos el numero de caracteres leido.
-		BEQ			FIN_PA			* Si es igual nos salimos.
+		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
 		MOVE.L		#2,D0			*BSET.B 		#1,D0// BIT 0 = 0, BIT 1 = 1;
-		MOVE.B		(A1)+,D1		* D1 caracter a escribir por ESCCAR
-		CMP.B 		#$0D,D1
-		BEQ 		FLAGA
-		BSR 		ESCCAR			* saltamos a ESCCAR
-		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer lleno
-		BEQ			PR_FIN			* Nos salimos
-		ADD.L		#1,D4			* Contador ++
+        BSR         ESCCAR
+		CMP.B 		#0,D0
+		BEQ 		PR_A
+		CMP.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
+		BEQ			FIN_PA			* Nos salimos
+
+PR_A:
+        ADD.L		#1,D5			* Contador ++
+        CMP.L       #13,D1
+        BEQ         FIN_PA
+        CMP.L       D4,D5
+        BEQ         FIN_PA
 		BRA 		PRINT_A
 
 FIN_PA:
 		MOVE.W		#$2700,SR		* Inhibimos interrupciones
 		BSET.B		#0,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
-		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones        
-		MOVE.L 		D4,D0
-		UNLK		A6
-		RTS 
+		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones
+		PRINT_FIN
 
 PRINT_B:
-		CMP.L		D2,D4			* Comprobamos el numero de caracteres leido.
-		BEQ			FIN_PB			* Si es igual nos salimos
-        
-        MOVE.B 		#3,D0			* BSET.B		#1,D0 //BIT 0 = 1, BIT 1 = 1;
-        MOVE.B		(A1)+,D1		* D1 caracter a escribir por ESCCAR
-        CMP.B 		#$0D,D1
-		BEQ 		FLAGB
-        BSR			ESCCAR			* saltamos a ESCCAR
-        CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer lleno
-		BEQ			PR_FIN			* 
-		ADD.L		#1,D4			* Contador ++
+		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
+		MOVE.L		#3,D0			*BSET.B 		#1,D0// BIT 0 = 0, BIT 1 = 1;
+        BSR         ESCCAR
+		CMP.B 		#0,D0
+		BEQ 		PR_B
+		CMP.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
+		BEQ			FIN_PB			* Nos salimos
+
+PR_B:
+        ADD.L		#1,D5			* Contador ++
+        CMP.L       #13,D1
+        BEQ         FIN_PB
+        CMP.L       D4,D5
+        BEQ         FIN_PB
 		BRA 		PRINT_B
 
 FIN_PB:
@@ -472,24 +472,11 @@ FIN_PB:
 		BSET.B		#4,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones        
-		MOVE.L 		D4,D0
-		UNLK		A6
-		RTS 
+        PRINT_FIN
 
-FLAGA:
-		BSR			ESCCAR
-		ADD.L		#1,D4			* Contador ++
-		BSR 		FIN_PA
-
-FLAGB:
-		BSR			ESCCAR
-		ADD.L		#1,D4			* Contador ++
-		BSR 		FIN_PB
-
-PR_FIN:	
-		MOVE.L 		D4,D0 
 PRINT_FIN:
-		UNLK		A6
+        MOVE.L 		D5,D0
+        UNLK		A6
 		RTS  
 **************************** FIN PRINT ******************************************************
 
