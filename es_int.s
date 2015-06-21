@@ -379,7 +379,7 @@ SCA_LO:
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ			SCAN_FIN		* Nos salimos si error.
 		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A4
-		ADD.L		#1,D4			* +1 en contador.
+		ADD.L		#1,D5			* +1 en contador.
 		BRA			SCA_LO			* Vuelvo a Scan
 		
 SCAN_B:
