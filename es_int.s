@@ -508,7 +508,7 @@ LINEA:
 
 LINE_A:	
 		BTST		#1,D0			* Comprobamos el bit 1
-		BEQ			LINA_T			* Si es 0 selecciona el buff de recepción
+		BNE			LINA_T			* Si es 0 selecciona el buff de recepción
 
 LINA_R:
         MOVE.L		pSA,A1		    * Cargamos el puntero que vamos a utilizar
