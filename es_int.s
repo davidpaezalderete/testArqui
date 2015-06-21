@@ -7,7 +7,7 @@
 
 	ORG	$0
 	DC.L	$8000		* Inicio de Pila
-	DC.L	BUFP03		* PC al inicio de PPAL1
+	DC.L	INICIO		* PC al inicio de PPAL1
 
 ********* Definición de los registros *********************
 
@@ -53,8 +53,8 @@ finPA:          DS.B    4       * Direccion de buffPA
 finPB:          DS.B    4       * Direccion de buffPB
 emptySA:        DS.B	1		* Bit para comprobar si está vacío SA
 emptySB:        DS.B	1		* Bit para comprobar si está vacío SB
-LLENO_PA:       DS.B	1		* Bit para comprobar si está lleno PA
-LLENO_PB:       DS.B	1		* Bit para comprobar si está lleno PB
+fullPA:       DS.B	1		* Bit para comprobar si está lleno PA
+fullPB:       DS.B	1		* Bit para comprobar si está lleno PB
 
 RET_TBA:	DS.B	1		* Bit para comprobar si hay que escribir un 0A en la RTI
 RET_TBB:	DS.B	1		* Bit para comprobar si hay que escribir un 0A en la RTI
@@ -520,8 +520,8 @@ LINE_B:
 		BTST		#1,D0			* Comprobamos el bit 1
 		BNE			BUN_TB			* Si es 1 selecciona buff de transmisión	
 
-BUN_RA:	MOVE.L		punSARTI,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L 		punSA,A4		* Cargamos el puntero de SCAN
+BUN_RA:	MOVE.L		pSARTI,A2		* Cargamos el puntero que vamos a utilizar
+		MOVE.L 		pSA,A4		* Cargamos el puntero de SCAN
 		LEA 		buffSB,A3		* Cargamos el final del buff
 		MOVE.L 		#0,D0
 SIGUERA:
@@ -536,8 +536,8 @@ LRC_RA:
 		ADD.L 		#1,A4		
 		BRA 		SIGUERA
 
-BUN_TA:	MOVE.L		punPA,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L		punPARTI,A4		* Cargamos puntero de lectura
+BUN_TA:	MOVE.L		pPA,A2		* Cargamos el puntero que vamos a utilizar
+		MOVE.L		pPARTI,A4		* Cargamos puntero de lectura
 		LEA			buffPB,A3		* Cargamos direccion de final de buff.
 		MOVE.L 		#0,D0
 SIGUETA:
@@ -552,8 +552,8 @@ LRC_TA:
 		ADD.L 		#1,A4
 		BRA 		SIGUETA
 
-BUN_RB:	MOVE.L 	punSBRTI,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L		punSB,A4		* Cargamos la dirección para comprobar si los punteros son iguales.
+BUN_RB:	MOVE.L      pSBRTI,A2		* Cargamos el puntero que vamos a utilizar
+		MOVE.L		pSB,A4		* Cargamos la dirección para comprobar si los punteros son iguales.
 		LEA 		buffPA,A3		* Cargamos la direccion del fin de buff
 		MOVE.L 		#0,D0
 SIGUERB:
@@ -569,8 +569,8 @@ LRC_RB:
 		BRA 		SIGUERB
 
 BUN_TB:
-		MOVE.L 		punPB,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L		punPBRTI,A4		* Cargamos la dirección para comprobar si estamos al final del buff.
+		MOVE.L 		pPB,A2		* Cargamos el puntero que vamos a utilizar
+		MOVE.L		pPBRTI,A4		* Cargamos la dirección para comprobar si estamos al final del buff.
 		LEA			finPB,A3		* Cargamos direccion de find e puntero
 		MOVE.L 		#0,D0
 SIGUETB:
@@ -642,7 +642,8 @@ RTI:
 		BNE			R_RDY_B			* Si es 1 recibir por linea B
 		BRA			RTI_FIN			* Si no esta activo ninguno saltar a RTI_FIN
 
-T_RDY_A:	MOVE.B		emptySA,D2
+T_RDY_A:
+        MOVE.B		emptySA,D2
 		CMP.B		#0,D2
 		BEQ		TLIN_A
 		MOVE.L		#0,D0			* D0 = 0
@@ -661,15 +662,16 @@ FIN_TA:
 		MOVE.L		#0,D0			* Limpiamos D0 al volver de vacio
 		BRA			RTI_FIN			* Saltamos al final de la rti
 		
-T_RDY_B:	MOVE.B		emptySB,D2
+T_RDY_B:
+        MOVE.B		emptySB,D2
 		CMP.B		#0,D2
-		BEQ		TLIN_B
+		BEQ         TLIN_B
 		MOVE.L		#0,D0			* D0 = 0
 		BSET		#1,D0			* BIT 0 = 1, BIT 1 = 1
 		BSET 		#0,D0			*	
 		BSR 		LEECAR			* Salto a LEECAR
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
-		BEQ		FIN_TB			* Si error, fin.
+		BEQ         FIN_TB			* Si error, fin.
 		MOVE.B 		D0,TBB			* Introducimos el caracter en la linea B de transmisión.
 		CMP.B 		#$0D,D0
 		BEQ 		TLIN_B
