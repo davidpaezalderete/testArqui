@@ -646,7 +646,7 @@ T_RDY_A:
 TR_A:
         MOVE.L		#2,D0			* D0 = 0
         BSR         LINEA
-        CMP.L       #0,DO
+        CMP.L       #0,D0
         BEQ         FIN_TA
 		MOVE.L		#2,D0			* BIT 0 = 0, BIT 1 = 1;
 		BSR 		LEECAR			* Salto a leecar.
@@ -676,7 +676,7 @@ T_RDY_B:
 TR_B:
         MOVE.L		#3,D0			* D0 = 0
         BSR         LINEA
-        CMP.L       #0,DO
+        CMP.L       #0,D0
         BEQ         FIN_TB
 		MOVE.L		#3,D0			* BIT 0 = 0, BIT 1 = 1;
 		BSR 		LEECAR			* Salto a leecar.
