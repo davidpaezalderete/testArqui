@@ -551,7 +551,7 @@ LINA_T:
         BRA         LI_FIN          * Salida
 
 LINA_TN:
-        MOVE.B      (A2)+,D1        * Se lee y carga el caracter en D1
+        MOVE.B      (A1)+,D1        * Se lee y carga el caracter en D1
         ADD.L       #1,D2           * Contador ++
         CMP.L       A2,A3           * se ha llegado al fin?
         BNE         LINA_TFIN       *
@@ -610,7 +610,7 @@ LINB_T:
         BRA         LI_FIN          * Salida
 
 LINB_TN:
-        MOVE.B      (A2)+,D1        * Se lee y carga el caracter en D1
+        MOVE.B      (A1)+,D1        * Se lee y carga el caracter en D1
         ADD.L       #1,D2           * Contador ++
         CMP.L       A2,A3           * se ha llegado al fin?
         BNE         LINB_TFIN       *
