@@ -498,7 +498,7 @@ LINEA:
 
 LINE_A:	
 		BTST		#1,D0			* Comprobamos el bit 1
-		BEQ			LINA_T			* Si es 0 selecciona el buff de recepción
+		BNE			LINA_T			* Si es 0 selecciona el buff de recepción
 
 LINA_R:
         MOVE.L		pSA,A1		    * Cargamos el puntero que vamos a utilizar
@@ -551,7 +551,7 @@ LINA_TFIN:
         CMP.B       #13,D1          * Caracter leido igual a retorno de carro?
         BEQ         LI_FIN          * Si, salida.
         CMP.L       A1,A2           *
-        BNE         LINA_T
+        BNE         LINA_TN
         MOVE.L      #0,D0           * 0 al salir.
         BRA         LI_FIN          * salida
 
@@ -610,7 +610,7 @@ LINB_TFIN:
         CMP.B       #13,D1          * Caracter leido igual a retorno de carro?
         BEQ         LI_FIN          * Si, salida.
         CMP.L       A1,A2           *
-        BNE         LINB_T
+        BNE         LINB_TN
         MOVE.L      #0,D0           * 0 al salir.
         BRA         LI_FIN          * salida
 
