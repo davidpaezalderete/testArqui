@@ -349,7 +349,7 @@ E_FIN:
 **************************** SCAN ************************************************************
 SCAN:
 		LINK		A6,#0
-		MOVE.L		8(A6),A1		* Dir. del buffer.
+		MOVE.L		8(A6),A4		* Dir. del buffer.
 		MOVE.W		12(A6),D1		* Descriptor --> D1
 		MOVE.W		14(A6),D2		* Tamaño --> D2
 		MOVE.L		#0,D4			* Inicializo contador
@@ -364,55 +364,45 @@ SCAN:
 		
 
 SCAN_A:	
-		MOVE.L 		D1,D0
+		MOVE.L 		#0,D0
 		BSR 		LINEA
-		CMP.B 		D2,D0
-		BGT 		LIN_PROB
-		CMP.B 		#0,D0
-		BEQ 		LIN_PROB
-		MOVE.L 		D0,D2
-		CMP.L		D4,D2			* Compruebo contadores
-		BEQ			SCAN_FIN			* Si son iguales nos salimos
-		MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio	
+		CMP.L 		#0,D0
+		BEQ 		SCAN_FIN
+		CMP.L		D2,D0			* Compruebo contadores
+		BGT			SCAN_FIN			* Si son iguales nos salimos
+SCA_LO:
+        CMP.L       D4,D0
+        BEQ         SCAN_FIN
+        MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
 		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
-		BEQ			SCAN_FIN			* Nos salimos si error.
-		MOVE.B		D0,(A1)+		* El caracter leido,D0, lo metemos en A1
+		BEQ			SCAN_FIN		* Nos salimos si error.
+		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A1
 		ADD.L		#1,D4			* +1 en contador.
-		BRA			SCAN_A			* Vuelvo a Scan
+		BRA			SCA_LO			* Vuelvo a Scan
 		
 SCAN_B:
-		MOVE.L 		D1,D0
+		MOVE.L 		#1,D0
 		BSR 		LINEA
-		CMP.B 		D2,D0
-		BGT 		LIN_PROB
-		CMP.B 		#0,D0
-		BEQ 		LIN_PROB
-		MOVE.L 		D0,D2
-		CMP.L		D4,D2			* Compruebo contadores
-		BEQ			SCAN_FIN			* Si son iguales nos salimos
-		MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
-		MOVE.B 		#1,D0			* 
-		BSR			LEECAR			* Salto a leecar.
+		CMP.L 		#0,D0
+		BEQ 		SCAN_FIN
+		CMP.L		D2,D0			* Compruebo contadores
+		BGT			SCAN_FIN			* Si son iguales nos salimos
+SCB_LO:
+        CMP.L       D4,D0
+        BEQ         SCAN_FIN
+        MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
+		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
-		BEQ			SCAN_FIN			* Nos salimos si error.
-		MOVE.B		D0,(A1)+		* El caracter leido,D0, lo metemos en A.
+		BEQ			SCAN_FIN		* Nos salimos si error.
+		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A1
 		ADD.L		#1,D4			* +1 en contador.
-		BRA			SCAN_B			* Vuelvo a Scan
+		BRA			SCB_LO			* Vuelvo a Scan
 
-LIN_PROB:
-		CLR.L		D0
-		UNLK 		A6
-		RTS
-		
 SCAN_FIN:
 		MOVE.L 		D4,D0
-		UNLK		A6
-		RTS 
-
-SCAN2_FIN:
-		UNLK 		A6
-		RTS 
+        UNLK 		A6
+		RTS
 
 
 		
