@@ -552,7 +552,7 @@ LINB_R:
         MOVE.L		pSB,A1		    * Cargamos el puntero que vamos a utilizar
 		MOVE.L 		pSBRTI,A2		* Cargamos el puntero de SCAN
 		MOVE.L		pfinSB,A3		* Cargamos el final del buff
-        MOVE.L      emptySB,D2      * FLAG DE vacio
+        MOVE.B      emptySB,D2      * FLAG DE vacio
         MOVE.L      #0,D0           * Contador
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINB_RN         * Si no son iguales se sigue en LINA_RN
@@ -714,14 +714,6 @@ R_RDY_B:
         MOVE.B      #0,emptySB
         BRA		RTI_FIN			* si error fin.
 
-
-TLIN_A:		MOVE.B 		#1,emptySA	
-		MOVE.B		#10,TBA
-		BRA		FIN_TA
-
-TLIN_B:		MOVE.B 		#1,emptySB		
-		MOVE.B		#10,TBB
-		BRA		FIN_TB
 
 
 
