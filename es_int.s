@@ -87,19 +87,19 @@ INIT:
         LEA             finSA,A1            * Direccion de fin buffSA
         MOVE.L          A1,pfinSA           * Puntero a dir de fin buffSA
 
-        LEA				buffSB,A1			* Dirección de buffSB -> A1
-		MOVE.L			A1,pSB              * pSB apunta al primero del buffSB
-		MOVE.L			A1,pSBRTI			* puntero para la RTI
-		MOVE.B			#1,emptySB			* El buffSB inicialmente no está lleno
-        LEA             finSB,A1               * Direccion de fin buffSB
-        MOVE.L          A1,pfinSB           * Puntero a dir de fin buffSB
-
         LEA				buffPA,A1			* Dirección de buffPA -> A1
 		MOVE.L			A1,pPA              * pPA apunta al primero del buffPA
 		MOVE.L			A1,pPARTI			* puntero para la RTI
 		MOVE.B			#0,fullPA			* El buffPA inicialmente no está lleno
         LEA             finPA,A1            * Direccion de fin buffPA
         MOVE.L          A1,pfinPA           * Puntero a dir de fin buffPA
+
+        LEA				buffSB,A1			* Dirección de buffSB -> A1
+		MOVE.L			A1,pSB              * pSB apunta al primero del buffSB
+		MOVE.L			A1,pSBRTI			* puntero para la RTI
+		MOVE.B			#1,emptySB			* El buffSB inicialmente no está lleno
+        LEA             finSB,A1               * Direccion de fin buffSB
+        MOVE.L          A1,pfinSB           * Puntero a dir de fin buffSB
 
         LEA				buffPB,A1			* Dirección de buffPB -> A1
 		MOVE.L			A1,pPB              * pPB apunta al primero del buffPB
@@ -238,52 +238,52 @@ EA:
         BTST        #1,D0
         BNE         EA_T
 EA_R:
-        MOVE.L		pSA,A1		* Llevo pSA a A1
+        MOVE.L		pSA,A1		    * Llevo pSA a A1
         MOVE.L		pSARTI,A2		* Llevo pRTISA a A2
-        MOVE.L		pfinSA,A3		* Llevo FINSA a A3
-        MOVE.B		emptySA,D2		* Llevo VACIO_SA a D2
-        CMP.L		A1,A2			* Comparo PUNSA y PUNRTISA
-        BNE         EA_RESC			* Si no son iguales voy a ESC_ARN para escribir normal
+        MOVE.L		pfinSA,A3		* Llevo puntero a A3
+        MOVE.B		emptySA,D2		* Llevo emptySA a D2
+        CMP.L		A1,A2			* Comparo punteros
+        BNE         EA_RESC			* Si no son iguales voy a EA_RESC para escribir normal
         CMP.B		#0,D2			* Miro si no está vacío el buffer
-        BNE         EA_RESC         * Si PUNSA y PUNRTISA son iguales y está vacío voy a ESC_ARN
+        BNE         EA_RESC         * Si los punteros son iguales y está vacío voy a EA_RESC
         MOVE.L		#$FFFFFFFF,D0
-        BRA         E_FIN           * Y salto a LEE_FIN
+        BRA         E_FIN           * Y salto a E_FIN
 EA_RESC:
         MOVE.B		D1,(A2)+		* Llevo el carácter a A2 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
-        MOVE.L		A2,pSARTI		* Actualizo PUNRTISA
+        MOVE.L		A2,pSARTI		* Actualizo puntero
         CMP.L		A2,A3			* Miro si he llegado al final
-        BNE         EA_RFIN         * Si no, salto a COMP_EAR
-        LEA         buffSA,A2		* Si he llegado al final llevo buffSA a A2 (buffer circular)
-        MOVE.L		A2,pSARTI		* Y actualizo PUNRTISA
+        BNE         EA_RFIN         * Si no, salto
+        LEA         buffSA,A2		* Si he llegado al final llevo buffSA a A2
+        MOVE.L		A2,pSARTI		* Y actualizo punteros
 EA_RFIN:
-        CMP.L		A1,A2			* Comparo PUNSA y PUNRTISA
-        BEQ         E_FIN			* Si son iguales voy a ESC_FIN
-        MOVE.B		#0,emptySA		* Si no, pongo un 0 en VACIO_SA
-        BRA         E_FIN			* Y salto a ESC_FIN
+        CMP.L		A1,A2			* Comparo punteros
+        BEQ         E_FIN			* Si son iguales voy a E_FIN
+        MOVE.B		#0,emptySA		* Si no, pongo un 0 en emptySA
+        BRA         E_FIN			* Y salto a E_FIN
 
 EA_T:
-        MOVE.L		pPA,A1		* Llevo PUNPA a A1
-        MOVE.L		pPARTI,A2		* Llevo PUNRTIPA a A2
-        MOVE.L		pfinPA,A3		* Llevo FINPA a A3
-        MOVE.B		fullPA,D2		* Llevo LLENO_PA a D2
-        CMP.L		A1,A2			* Comparo PUNPA y PUNRTIPA
-        BNE         EA_TESC			* Si no son iguales voy a ESC_ATN para escribir normal
+        MOVE.L		pPA,A1          * Llevo puntero a A1
+        MOVE.L		pPARTI,A2		* Llevo puntero a A2
+        MOVE.L		pfinPA,A3		* Llevo punter a A3
+        MOVE.B		fullPA,D2		* Llevo puntero a D2
+        CMP.L		A1,A2			* Comparo punteros
+        BNE         EA_TESC			* Si no son iguales voy a EA_TESC para escribir
         CMP.B		#1,D2			* Miro si está lleno el buffer
-        BNE         EA_TESC			* Si PUNPA y PUNRTIPA son iguales y está lleno voy a ESC_ATN
-        MOVE.L		#$FFFFFFFF,D0		* Si PUNPA y PUNRTIPA son iguales y no está lleno devuelv
-        BRA         E_FIN			* Y salto a ESC_FIN
+        BNE         EA_TESC			* Si punteros son iguales y está lleno salto
+        MOVE.L		#$FFFFFFFF,D0	* Si punteros son iguales y no está lleno devuelv
+        BRA         E_FIN			* Y salto a E_FIN
 EA_TESC:
         MOVE.B		D1,(A1)+		* Llevo el carácter a A1 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
-        MOVE.L		A1,pPA		    * Actualizo PUNPA
+        MOVE.L		A1,pPA		    * Actualizo puntero
         CMP.L		A1,A3			* Miro si he llegado al final
-        BNE         EA_TFIN		    *   Si no, salto a COMP_EAT
-        LEA         buffPA,A1		* Si he llegado al final llevo buffPA a A1 (buffer circular)
-        MOVE.L		A1,pPA		    * Y actualizo PUNPA
+        BNE         EA_TFIN		    *   Si no, salto
+        LEA         buffPA,A1		* Si he llegado al final llevo buffPA a A1
+        MOVE.L		A1,pPA		    * Y actualizo puntero
 EA_TFIN:
-        CMP.L		A1,A2			* Comparo PUNPA y PUNRTIPA
-        BNE         E_FIN			* Si no son iguales voy a ESC_FIN
+        CMP.L		A1,A2			* Comparo punteros
+        BNE         E_FIN			* Si no son iguales voy a E_FIN
         MOVE.B		#1,fullPA		* Si sí son iguales
         BRa         E_FIN
 
@@ -291,52 +291,52 @@ EB:
         BTST        #1,D0
         BNE         EB_T
 EB_R:
-        MOVE.L		pSB,A1		* Llevo PUNSA a A1
-        MOVE.L		pSBRTI,A2		* Llevo PUNRTISA a A2
-        MOVE.L		pfinSB,A3		* Llevo FINSA a A3
-        MOVE.B		emptySB,D2		* Llevo VACIO_SA a D2
-        CMP.L		A1,A2			* Comparo PUNSA y PUNRTISA
-        BNE         EB_RESC			* Si no son iguales voy a ESC_ARN para escribir normal
+        MOVE.L		pSB,A1		* Llevo punteros a A1
+        MOVE.L		pSBRTI,A2		* Llevo puntero a A2
+        MOVE.L		pfinSB,A3		* Llevo puntero a A3
+        MOVE.B		emptySB,D2		* Llevo emptySA a D2
+        CMP.L		A1,A2			* Comparo punteros
+        BNE         EB_RESC			* Si no son iguales salto
         CMP.B		#0,D2			* Miro si no está vacío el buffer
-        BNE         EB_RESC         * Si PUNSA y PUNRTISA son iguales y está vacío voy a ESC_ARN
+        BNE         EB_RESC         * Si los punteros son iguales y está vacío voy a EB_RESC
         MOVE.L		#$FFFFFFFF,D0
-        BRA         E_FIN           * Y salto a LEE_FIN
+        BRA         E_FIN           * Y salto a E_FIN
 EB_RESC:
         MOVE.B		D1,(A2)+		* Llevo el carácter a A2 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
-        MOVE.L		A2,pSBRTI		* Actualizo PUNRTISA
+        MOVE.L		A2,pSBRTI		* Actualizo puntero
         CMP.L		A2,A3			* Miro si he llegado al final
-        BNE         EB_RFIN         * Si no, salto a COMP_EAR
+        BNE         EB_RFIN         * Si no, salto
         LEA         buffSB,A2		* Si he llegado al final llevo buffSA a A2 (buffer circular)
-        MOVE.L		A2,pSBRTI		* Y actualizo PUNRTISA
+        MOVE.L		A2,pSBRTI		* Y actualizo puntero
 EB_RFIN:
-        CMP.L		A1,A2			* Comparo PUNSA y PUNRTISA
-        BEQ         E_FIN			* Si son iguales voy a ESC_FIN
-        MOVE.B		#0,emptySB		* Si no, pongo un 0 en VACIO_SA
-        BRA         E_FIN			* Y salto a ESC_FIN
+        CMP.L		A1,A2			* Comparo punteros
+        BEQ         E_FIN			* Si son iguales voy a E_FIN
+        MOVE.B		#0,emptySB		* Si no, pongo un 0 en emptySa
+        BRA         E_FIN			* Y salto a E_FIN
 
 EB_T:
-        MOVE.L		pPB,A1		* Llevo PUNPA a A1
-        MOVE.L		pPBRTI,A2		* Llevo PUNRTIPA a A2
-        MOVE.L		pfinPB,A3		* Llevo FINPA a A3
-        MOVE.B		fullPB,D2		* Llevo LLENO_PA a D2
-        CMP.L		A1,A2			* Comparo PUNPA y PUNRTIPA
-        BNE         EB_TESC			* Si no son iguales voy a ESC_ATN para escribir normal
+        MOVE.L		pPB,A1		* Llevo puntero a A1
+        MOVE.L		pPBRTI,A2		* Llevo puntero a A2
+        MOVE.L		pfinPB,A3		* Llevo puntero a A3
+        MOVE.B		fullPB,D2		* Llevo fullPB a D2
+        CMP.L		A1,A2			* Comparo punteros
+        BNE         EB_TESC			* Si no son iguales salto
         CMP.B		#1,D2			* Miro si está lleno el buffer
-        BNE         EB_TESC			* Si PUNPA y PUNRTIPA son iguales y está lleno voy a ESC_ATN
-        MOVE.L		#$FFFFFFFF,D0		* Si PUNPA y PUNRTIPA son iguales y no está lleno devuelv
+        BNE         EB_TESC			* Si punteros son iguales y está lleno salto
+        MOVE.L		#$FFFFFFFF,D0	* Si puntero son iguales y no está lleno devuelv
         BRA         E_FIN			* Y salto a ESC_FIN
 EB_TESC:
         MOVE.B		D1,(A1)+		* Llevo el carácter a A1 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
-        MOVE.L		A1,pPB		* Actualizo PUNPA
+        MOVE.L		A1,pPB          * Actualizo puntero
         CMP.L		A1,A3			* Miro si he llegado al final
-        BNE         EA_TFIN		* Si no, salto a COMP_EAT
-        LEA         buffPB,A1		* Si he llegado al final llevo buffPA a A1 (buffer circular)
-        MOVE.L		A1,pPB		* Y actualizo PUNPA
+        BNE         EA_TFIN         * Si no, salto
+        LEA         buffPB,A1		* Si he llegado al final llevo buffPA a A1
+        MOVE.L		A1,pPB          * Y actualizo puntero
 EB_TFIN:
-        CMP.L		A1,A2			* Comparo PUNPA y PUNRTIPA
-        BNE         E_FIN			* Si no son iguales voy a ESC_FIN
+        CMP.L		A1,A2			* Comparo punteros
+        BNE         E_FIN			* Si no son iguales voy a E_FIN
         MOVE.B		#1,fullPB		* Si sí son iguales
 
 
@@ -350,8 +350,8 @@ E_FIN:
 SCAN:
 		LINK		A6,#0
 		MOVE.L		8(A6),A4		* Dir. del buffer.
-		MOVE.W		12(A6),D3		* Descriptor --> D1
-		MOVE.W		14(A6),D4		* Tamaño --> D2
+		MOVE.W		12(A6),D3		* Descriptor --> D3
+		MOVE.W		14(A6),D4		* Tamaño --> D4
 		MOVE.L		#0,D5			* Inicializo contador
 		CMP.L		#0,D4			* Si tamaño = 0
 		BEQ			SCAN_FIN
@@ -364,13 +364,13 @@ SCAN:
 		
 
 SCAN_A:	
-		MOVE.L 		#0,D0
-		BSR 		LINEA
-		CMP.L 		#0,D0
+		MOVE.L 		#0,D0           *
+		BSR 		LINEA           * Se comprueba la linea
+		CMP.L 		#0,D0           * Si D0 es 0 salto a fin
 		BEQ 		SCAN_FIN
-        MOVE.L      D0,D6
-		CMP.L		D4,D6			* Compruebo contadores
-		BGT			SCAN_FIN			* Si son iguales nos salimos
+        MOVE.L      D0,D6           * SI no, se guarda el resultado de linea y se compara con tamaño
+		CMP.L		D4,D6           * Compruebo contadores
+		BGT			SCAN_FIN		* Si son iguales nos salimos
 SCA_LO:
         CMP.L       D5,D6
         BEQ         SCAN_FIN
@@ -388,8 +388,8 @@ SCAN_B:
 		CMP.L 		#0,D0
 		BEQ 		SCAN_FIN
         MOVE.L      D0,D6
-		CMP.L		D4,D6			* Compruebo contadores
-		BGT			SCAN_FIN			* Si son iguales nos salimos
+		CMP.L		D4,D6
+		BGT			SCAN_FIN
 SCB_LO:
         CMP.L       D5,D6
         BEQ         SCAN_FIN
@@ -428,7 +428,7 @@ PRINT:  LINK		A6,#0
 		
 PRINT_A:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
-		MOVE.L		#2,D0			*BSET.B 		#1,D0// BIT 0 = 0, BIT 1 = 1;
+		MOVE.L		#2,D0			* BSET.B 		#1,D0// BIT 0 = 0, BIT 1 = 1;
         BSR         ESCCAR
 		CMP.B 		#0,D0
 		BEQ 		PR_A
@@ -805,3 +805,232 @@ ILLEGAL_IN:
 PRIV_VIOLT:
 	BREAK * Privilege violation handler
 	NOP
+
+
+
+PR17:
+	BSR INIT
+	MOVE.L #8,D1
+	MOVE.L punSARTI,A1
+	MOVE.B D1,(A1)+ 
+	MOVE.L A1,punSARTI
+	MOVE.L #0,D0
+	BSR LINEA
+	BREAK
+
+PR18: 
+	BSR INIT
+	MOVE.L #8,D1
+	MOVE.L punSBRTI,A1
+	MOVE.B D1,(A1)+ 
+	MOVE.L #$0D,D1
+	MOVE.B D1,(A1)+ 
+	MOVE.L A1,punSBRTI
+	MOVE.L #1,D0
+	BSR LINEA
+	BREAK
+
+PR19: 
+	BSR INIT
+	MOVE.L #1,D1
+	MOVE.L punPA,A1
+	MOVE.B D1,(A1)+ 
+	MOVE.L #2,D1
+	MOVE.B D1,(A1)+	
+	MOVE.L #3,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #4,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #5,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #6,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #7,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #8,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #9,D1	
+	MOVE.B D1,(A1)+
+	MOVE.L #$0D,D1
+	MOVE.B D1,(A1)+ 
+	MOVE.L A1,punPA
+	MOVE.L #2,D0
+	BSR LINEA
+	BREAK
+
+PR20: 
+	BSR INIT
+	MOVE.L #600,D5
+	MOVE.L punPB,A1
+	MOVE.L #8,D1
+BUC20:	MOVE.B D1,(A1)+ 
+	SUB    #1,D5
+	CMP.L  #0,D5
+	BNE    BUC20 
+	MOVE.L A1,punPB
+	MOVE.L #3,D0
+	BSR LINEA
+	BREAK
+
+PR21: 
+	BSR INIT
+	MOVE.L #600,D5
+	MOVE.L punSARTI,A1
+	MOVE.L #8,D1
+BUC21:	MOVE.B D1,(A1)+ 
+	SUB    #1,D5
+	CMP.L  #0,D5
+	BNE    BUC21 
+	MOVE.L A1,punSARTI
+	MOVE.L #0,D0
+	BSR LINEA
+	BREAK
+
+PR22:
+	BSR INIT
+	MOVE.L #0,D2
+	MOVE.L #1500,D5
+	MOVE.L punPB,A1
+	MOVE.L #8,D1
+BUC22:	MOVE.L #3,D0
+	BSR ESCCAR
+	SUB    #1,D5
+	CMP.L  #0,D5
+	BNE BUC22
+	MOVE.L #1500,D5
+BUC222:	MOVE.L #3,D0
+	BSR LEECAR
+	SUB #1,D5
+	CMP.L #0,D5
+	BNE BUC222
+	MOVE.L #1000,D5
+	MOVE.L #88,D1
+BUC223:	MOVE.L #3,D0
+	BSR ESCCAR
+	SUB    #1,D5
+	CMP.L  #0,D5
+	BNE BUC223
+	MOVE.L #1000,D5
+	MOVE.L #0,D2
+BUC224:	MOVE.L #3,D0
+	BSR LEECAR
+	SUB #1,D5
+	ADD.L #1,D2
+	CMP.L #0,D5
+	BNE BUC224
+	BREAK
+
+	
+
+
+PR14:
+	BSR INIT
+	MOVE.L #2,D0
+	MOVE.L #200,D5
+	MOVE.L #0,D6
+BUCA: 
+	MOVE.L #3,D0	
+	MOVE.L #$0,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$1,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$2,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$3,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$4,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$5,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$6,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$7,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$8,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$9,D1
+	BSR ESCCAR
+	SUB.L #1,D5
+	ADD.L #1,D6
+	CMP.L #0,D5
+	BEQ SAL2	
+	CMP.L #$FFFFFFFF,D0
+	BEQ SAL2	
+	BRA BUCA
+HOSTIA:
+	BREAK
+
+SAL2:
+	MOVE.L #10,D5
+	MOVE.L #$0,D6
+
+BUC2:
+	ADD.L #1,D6
+	MOVE.L #3,D0
+	BSR LEECAR
+	SUB.L #1,D5
+	CMP.L #0,D5
+	BEQ SAL3
+	CMP.L #$FFFFFFFF,D0
+	BEQ SAL3
+	BRA BUC2
+SAL3:
+	MOVE.L #3,D0
+	MOVE.L #$71,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$11,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$22,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$33,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$44,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$55,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$66,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$77,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$88,D1
+	BSR ESCCAR
+	MOVE.L #3,D0
+	MOVE.L #$99,D1
+	BSR ESCCAR
+	MOVE.L #2000,D5
+	MOVE.L #0,D6
+	BRA SAL4
+SAL4:
+	
+		MOVE.L #3,D0
+	BSR LEECAR
+	ADD.L #1,D6
+	SUB.L #1,D5
+	CMP.L #0,D5
+	BEQ SAL5
+	CMP.L #$FFFFFFFF,D0
+	BEQ SAL5
+	
+	BRA SAL4
+SAL5:
+	BREAK
+
+
+
