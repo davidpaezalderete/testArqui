@@ -102,7 +102,7 @@ INIT:
         MOVE.L          A1,pfinPA           * Puntero a dir de fin buffPA
 
         LEA				buffPB,A1			* Dirección de buffPB -> A1
-		MOVE.L			A1,pPB              * punPB apunta al primero del buffPB
+		MOVE.L			A1,pPB              * pPB apunta al primero del buffPB
 		MOVE.L			A1,pPBRTI			* puntero para la RTI
 		MOVE.B			#0,fullPB			* El buffPB inicialmente no está lleno
 		LEA				finPB,A1			* Direccion de fin buffPB
@@ -238,8 +238,8 @@ EA:
         BTST        #1,D0
         BNE         EA_T
 EA_R:
-        MOVE.L		pSA,A1		* Llevo PUNSA a A1
-        MOVE.L		pSARTI,A2		* Llevo PUNRTISA a A2
+        MOVE.L		pSA,A1		* Llevo pSA a A1
+        MOVE.L		pSARTI,A2		* Llevo pRTISA a A2
         MOVE.L		pfinSA,A3		* Llevo FINSA a A3
         MOVE.B		emptySA,D2		* Llevo VACIO_SA a D2
         CMP.L		A1,A2			* Comparo PUNSA y PUNRTISA
@@ -276,11 +276,11 @@ EA_T:
 EA_TESC:
         MOVE.B		D1,(A1)+		* Llevo el carácter a A1 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
-        MOVE.L		A1,pPA		* Actualizo PUNPA
+        MOVE.L		A1,pPA		    * Actualizo PUNPA
         CMP.L		A1,A3			* Miro si he llegado al final
-        BNE         EA_TFIN		* Si no, salto a COMP_EAT
+        BNE         EA_TFIN		    *   Si no, salto a COMP_EAT
         LEA         buffPA,A1		* Si he llegado al final llevo buffPA a A1 (buffer circular)
-        MOVE.L		A1,pPA		* Y actualizo PUNPA
+        MOVE.L		A1,pPA		    * Y actualizo PUNPA
 EA_TFIN:
         CMP.L		A1,A2			* Comparo PUNPA y PUNRTIPA
         BNE         E_FIN			* Si no son iguales voy a ESC_FIN
@@ -503,115 +503,129 @@ PRINT_FIN:
 
 **********************  LINEA  ******************************
 LINEA:
-		LINK 		A6,#0
 		BTST		#0,D0			* Comprobamos el bit 0
 		BNE			LINE_B			* Si es 1 Linea de transmision B
-		BTST		#0,D0			* Comprobamos el bit 0
-		BEQ 		LINE_A			* Si es 0 Linea de transmisión A			
 
 LINE_A:	
 		BTST		#1,D0			* Comprobamos el bit 1
-		BEQ			BUN_RA			* Si es 0 selecciona el buff de recepción
+		BEQ			LINA_T			* Si es 0 selecciona el buff de recepción
+
+LINA_R:
+        MOVE.L		pSA,A1		    * Cargamos el puntero que vamos a utilizar
+		MOVE.L 		pSARTI,A2		* Cargamos el puntero de SCAN
+		MOVE.L		pfinSA,A3		* Cargamos el final del buff
+        MOVE.L      emptySA,D2      * FLAG DE vacio
+        MOVE.L      #0,D0           * Contador
+        CMP.L       A1,A2           * Se comparan los punteros
+        BNE         LINA_RN         * Si no son iguales se sigue en LINA_RN
+        CMP.B       #1,D2           * Si no, se mira si buff vacio
+        BNE         LINA_RN         *
+        BRA         LI_FIN
+
+LINA_RN:
+        MOVE.B      (A1)+,D1        * Se lee el caracer en D1
+        ADD.L       #1,D0           * Contador ++
+        CMP.L       A1,A3           * Se comprueban los punteros despues de leer
+        BNE         LINA_RFIN        * Si no son iguales se sale
+        LEA         buffSA,A1       * Si lo son, se resetea el puntero al principio
+
+LINA_RFIN:
+        CMP.B       #13,D1          * Caracter leido igual a retorono de carro?
+        BEQ         LI_FIN          * Si lo es, se sale.
+        CMP.L       A1,A2           * si no se comprueban los punteros
+        BNE         LINA_RN         * si no son iguales se sigue leyendo.
+        MOVE.L      #0,DO           * Si lo son, se pone 0 en D0
+        BRA         LI_FIN          * Salida
+
+LINA_T:
+        MOVE.L      pPA,A1          * Carga puntero
+        MOVE.L      pPARTI,A2
+        MOVE.L      pfinPA,A3
+        MOVE.B      fullPA,D2       * Flag de buffer lleno
+        MOVE.L      #0,D2           * Contador
+        CMP.L       A1,A2           * Se comparan los punteros
+        BNE         LINA_TN         * SI no son iguales se sigue
+        CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
+        BNE         LINA_TN         * Si flag lleno, salida
+        MOVE.L      #0,D0           * Al salir, 0 -> D0
+        BRA         LI_FIN          * Salida
+
+LINA_TN:
+        MOVE.B      (A2)+,D1        * Se lee y carga el caracter en D1
+        ADD.L       #1,D2           * Contador ++
+        CMP.L       A2,A3           * se ha llegado al fin?
+        BNE         LINA_TFIN       *
+        LEA         buffPA,A2       * Se resetea el puntero
+
+LINA_TFIN:
+        CMP.B       #13,D1          * Caracter leido igual a retorno de carro?
+        BEQ         LI_FIN          * Si, salida.
+        CMP.L       A1,A2           *
+        BNE         LINA_T
+        MOVE.L      #0,D0           * 0 al salir.
+        BRA         LI_FIN          * salida
+
+LINE_B:
 		BTST		#1,D0			* Comprobamos el bit 1
-		BNE			BUN_TA			* Si es 1 selecciona buff de transmisión	
-LINE_B:	
-		BTST		#1,D0			* Comprobamos el bit 1
-		BEQ			BUN_RB			* Si es 0 selecciona el buff de recepción
-		BTST		#1,D0			* Comprobamos el bit 1
-		BNE			BUN_TB			* Si es 1 selecciona buff de transmisión	
+		BEQ			LINB_T			* Si es 0 selecciona el buff de recepción
 
-BUN_RA:	MOVE.L		pSARTI,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L 		pSA,A4		* Cargamos el puntero de SCAN
-		LEA 		buffSB,A3		* Cargamos el final del buff
-		MOVE.L 		#0,D0
-SIGUERA:
-		CMP.L 		A4,A3
-		BEQ 		LR_RA
-LRC_RA:
-		CMP.L 		A2,A4
-		BEQ			OUT_1
-		ADD.L 		#1,D0
-		CMP.B		#$0D,(A4)
-		BEQ			OUT
-		ADD.L 		#1,A4		
-		BRA 		SIGUERA
+LINB_R:
+        MOVE.L		pSB,A1		    * Cargamos el puntero que vamos a utilizar
+		MOVE.L 		pSBRTI,A2		* Cargamos el puntero de SCAN
+		MOVE.L		pfinSB,A3		* Cargamos el final del buff
+        MOVE.L      emptySB,D2      * FLAG DE vacio
+        MOVE.L      #0,D0           * Contador
+        CMP.L       A1,A2           * Se comparan los punteros
+        BNE         LINB_RN         * Si no son iguales se sigue en LINA_RN
+        CMP.B       #1,D2           * Si no, se mira si buff vacio
+        BNE         LINB_RN         *
+        BRA         LI_FIN
 
-BUN_TA:	MOVE.L		pPA,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L		pPARTI,A4		* Cargamos puntero de lectura
-		LEA			buffPB,A3		* Cargamos direccion de final de buff.
-		MOVE.L 		#0,D0
-SIGUETA:
-		CMP.L 		A4,A3
-		BEQ 		LR_TA
-LRC_TA:
-		CMP.L 		A2,A4
-		BEQ			OUT_1
-		ADD.L 		#1,D0
-		CMP.B		#$0D,(A4)
-		BEQ			OUT
-		ADD.L 		#1,A4
-		BRA 		SIGUETA
+LINB_RN:
+        MOVE.B      (A1)+,D1        * Se lee el caracer en D1
+        ADD.L       #1,D0           * Contador ++
+        CMP.L       A1,A3           * Se comprueban los punteros despues de leer
+        BNE         LINB_RFIN        * Si no son iguales se sale
+        LEA         buffSA,A1       * Si lo son, se resetea el puntero al principio
 
-BUN_RB:	MOVE.L      pSBRTI,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L		pSB,A4		* Cargamos la dirección para comprobar si los punteros son iguales.
-		LEA 		buffPA,A3		* Cargamos la direccion del fin de buff
-		MOVE.L 		#0,D0
-SIGUERB:
-		CMP.L 		A4,A3
-		BEQ 		LR_RB
-LRC_RB:
-		CMP.L 		A2,A4
-		BEQ			OUT_1
-		ADD.L 		#1,D0
-		CMP.B		#$0D,(A4)
-		BEQ			OUT
-		ADD.L 		#1,A4		
-		BRA 		SIGUERB
+LINB_RFIN:
+        CMP.B       #13,D1          * Caracter leido igual a retorono de carro?
+        BEQ         LI_FIN          * Si lo es, se sale.
+        CMP.L       A1,A2           * si no se comprueban los punteros
+        BNE         LINB_RN         * si no son iguales se sigue leyendo.
+        MOVE.L      #0,DO           * Si lo son, se pone 0 en D0
+        BRA         LI_FIN          * Salida
 
-BUN_TB:
-		MOVE.L 		pPB,A2		* Cargamos el puntero que vamos a utilizar
-		MOVE.L		pPBRTI,A4		* Cargamos la dirección para comprobar si estamos al final del buff.
-		LEA			finPB,A3		* Cargamos direccion de find e puntero
-		MOVE.L 		#0,D0
-SIGUETB:
-		CMP.L 		A4,A3
-		BEQ 		LR_RA
-LRC_TB:
-		CMP.L 		A2,A4
-		BEQ			OUT_1
-		ADD.L 		#1,D0
-		CMP.B		#$0D,(A4)
-		BEQ			OUT
-		ADD.L 		#1,A4		
-		BRA 		SIGUETB
-OUT:
-		UNLK A6
-		RTS
-OUT_1:
-		CMP.B 		#$0D,(A4)
-		BEQ 		OUT
-		CLR.L 		D0
-		UNLK 		A6
-		RTS
+LINB_T:
+        MOVE.L      pPB,A1          * Carga puntero
+        MOVE.L      pPBRTI,A2
+        MOVE.L      pfinPB,A3
+        MOVE.B      fullPB,D2       * Flag de buffer lleno
+        MOVE.L      #0,D2           * Contador
+        CMP.L       A1,A2           * Se comparan los punteros
+        BNE         LINB_TN         * SI no son iguales se sigue
+        CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
+        BNE         LINB_TN         * Si flag lleno, salida
+        MOVE.L      #0,D0           * Al salir, 0 -> D0
+        BRA         LI_FIN          * Salida
 
-LR_TA:
-		LEA buffPA,A5
-		MOVE.L A5,A2
-		BRA LRC_TA
+LINB_TN:
+        MOVE.B      (A2)+,D1        * Se lee y carga el caracter en D1
+        ADD.L       #1,D2           * Contador ++
+        CMP.L       A2,A3           * se ha llegado al fin?
+        BNE         LINB_TFIN       *
+        LEA         buffPB,A2       * Se resetea el puntero
 
-LR_RA:
-		LEA buffSA,A5
-		MOVE.L A5,A2
-		BRA LRC_RA
-LR_RB:
-		LEA buffSB,A5
-		MOVE.L A5,A2
-		BRA LRC_RB
+LINB_TFIN:
+        CMP.B       #13,D1          * Caracter leido igual a retorno de carro?
+        BEQ         LI_FIN          * Si, salida.
+        CMP.L       A1,A2           *
+        BNE         LINB_T
+        MOVE.L      #0,D0           * 0 al salir.
+        BRA         LI_FIN          * salida
 
-LR_TB:
-		LEA buffPB,A5
-		MOVE.L A5,A2
-		BRA LRC_TB
+LI_FIN:
+        RTS
 
 
 ****************************  FIN LINEA  ********************************************************
