@@ -350,14 +350,14 @@ E_FIN:
 SCAN:
 		LINK		A6,#0
 		MOVE.L		8(A6),A4		* Dir. del buffer.
-		MOVE.W		12(A6),D1		* Descriptor --> D1
-		MOVE.W		14(A6),D2		* Tamaño --> D2
-		MOVE.L		#0,D4			* Inicializo contador
-		CMP.L		#0,D2			* Si tamaño = 0
+		MOVE.W		12(A6),D3		* Descriptor --> D1
+		MOVE.W		14(A6),D4		* Tamaño --> D2
+		MOVE.L		#0,D5			* Inicializo contador
+		CMP.L		#0,D4			* Si tamaño = 0
 		BEQ			SCAN_FIN
-		CMP.B		#0,D1
+		CMP.B		#0,D3
 		BEQ			SCAN_A			* Si descriptor = 0 lee de A
-		CMP.B		#1,D1
+		CMP.B		#1,D3
 		BEQ			SCAN_B			* Si descriptor = 1 lee de B
 		MOVE.L		#$FFFFFFFF,D0	* Si no ERROR
 		BRA			SCAN2_FIN		* y sale de SCAN
@@ -368,16 +368,17 @@ SCAN_A:
 		BSR 		LINEA
 		CMP.L 		#0,D0
 		BEQ 		SCAN_FIN
-		CMP.L		D2,D0			* Compruebo contadores
+        MOVE.L      D0,D6
+		CMP.L		D4,D6			* Compruebo contadores
 		BGT			SCAN_FIN			* Si son iguales nos salimos
 SCA_LO:
-        CMP.L       D4,D0
+        CMP.L       D5,D6
         BEQ         SCAN_FIN
         MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
 		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ			SCAN_FIN		* Nos salimos si error.
-		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A1
+		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A4
 		ADD.L		#1,D4			* +1 en contador.
 		BRA			SCA_LO			* Vuelvo a Scan
 		
@@ -386,21 +387,22 @@ SCAN_B:
 		BSR 		LINEA
 		CMP.L 		#0,D0
 		BEQ 		SCAN_FIN
-		CMP.L		D2,D0			* Compruebo contadores
+        MOVE.L      D0,D6
+		CMP.L		D4,D6			* Compruebo contadores
 		BGT			SCAN_FIN			* Si son iguales nos salimos
 SCB_LO:
-        CMP.L       D4,D0
+        CMP.L       D5,D6
         BEQ         SCAN_FIN
         MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
 		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ			SCAN_FIN		* Nos salimos si error.
 		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A1
-		ADD.L		#1,D4			* +1 en contador.
+		ADD.L		#1,D5			* +1 en contador.
 		BRA			SCB_LO			* Vuelvo a Scan
 
 SCAN_FIN:
-		MOVE.L 		D4,D0
+		MOVE.L 		D5,D0
         UNLK 		A6
 		RTS
 
