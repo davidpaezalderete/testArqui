@@ -448,7 +448,7 @@ FIN_PA:
 		BSET.B		#0,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones
-		PRINT_FIN
+		BRA PRINT_FIN
 
 PRINT_B:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
@@ -472,7 +472,7 @@ FIN_PB:
 		BSET.B		#4,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones        
-        PRINT_FIN
+        BRA PRINT_FIN
 
 PRINT_FIN:
         MOVE.L 		D5,D0
