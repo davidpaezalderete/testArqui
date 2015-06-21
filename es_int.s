@@ -126,7 +126,7 @@ LA_R:
         MOVE.L      pSA,A1          * Carga puntero
         MOVE.L      pSARTI,A2       * Carga puntero RTI
         MOVE.L      pfinSA,A3       * PUNTERO DE fin
-        MOVE.L      emptySA,D2      * Flag de vacio
+        MOVE.B      emptySA,D2      * Flag de vacio
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_RLEE         * Si son distintos leo
         CMP.B       #1,D2           * Son iguales, buffer vacio?
@@ -178,7 +178,7 @@ LB_R:
         MOVE.L      pSB,A1          * Carga puntero
         MOVE.L      pSBRTI,A2       * Carga puntero RTI
         MOVE.L      pfinSB,A3       * PUNTERO DE fin
-        MOVE.L      emptySB,D2      * Flag de vacio
+        MOVE.B      emptySB,D2      * Flag de vacio
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_RLEE         * Si son distintos leo
         CMP.B       #1,D2           * Son iguales, buffer vacio?
@@ -493,8 +493,8 @@ LINA_R:
         MOVE.L		pSA,A1		    * Cargamos el puntero que vamos a utilizar
 		MOVE.L 		pSARTI,A2		* Cargamos el puntero de SCAN
 		MOVE.L		pfinSA,A3		* Cargamos el final del buff
-        MOVE.L      emptySA,D2      * FLAG DE vacio
-        MOVE.L      #0,D0           * Contador
+        MOVE.B      emptySA,D2      * FLAG DE vacio
+        MOVE.L      #0,D0
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINA_RN         * Si no son iguales se sigue en LINA_RN
         CMP.B       #1,D2           * Si no, se mira si buff vacio
@@ -521,7 +521,7 @@ LINA_T:
         MOVE.L      pPARTI,A2
         MOVE.L      pfinPA,A3
         MOVE.B      fullPA,D2       * Flag de buffer lleno
-        MOVE.L      #0,D2           * Contador
+        MOVE.L		#0,D0
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINA_TN         * SI no son iguales se sigue
         CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
@@ -531,7 +531,7 @@ LINA_T:
 
 LINA_TN:
         MOVE.B      (A1)+,D1        * Se lee y carga el caracter en D1
-        ADD.L       #1,D2           * Contador ++
+        ADD.L       #1,D0           * Contador ++
         CMP.L       A2,A3           * se ha llegado al fin?
         BNE         LINA_TFIN       *
         LEA         buffPA,A2       * Se resetea el puntero
@@ -553,7 +553,7 @@ LINB_R:
 		MOVE.L 		pSBRTI,A2		* Cargamos el puntero de SCAN
 		MOVE.L		pfinSB,A3		* Cargamos el final del buff
         MOVE.B      emptySB,D2      * FLAG DE vacio
-        MOVE.L      #0,D0           * Contador
+        MOVE.L		#0,D0
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINB_RN         * Si no son iguales se sigue en LINA_RN
         CMP.B       #1,D2           * Si no, se mira si buff vacio
@@ -580,7 +580,7 @@ LINB_T:
         MOVE.L      pPBRTI,A2
         MOVE.L      pfinPB,A3
         MOVE.B      fullPB,D2       * Flag de buffer lleno
-        MOVE.L      #0,D2           * Contador
+        MOVE.L      #0,D0           * Contador
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINB_TN         * SI no son iguales se sigue
         CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
@@ -590,7 +590,7 @@ LINB_T:
 
 LINB_TN:
         MOVE.B      (A1)+,D1        * Se lee y carga el caracter en D1
-        ADD.L       #1,D2           * Contador ++
+        ADD.L       #1,D0           * Contador ++
         CMP.L       A2,A3           * se ha llegado al fin?
         BNE         LINB_TFIN       *
         LEA         buffPB,A2       * Se resetea el puntero
