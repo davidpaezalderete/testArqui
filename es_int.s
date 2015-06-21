@@ -417,7 +417,7 @@ PRINT:  LINK		A6,#0
 		MOVE.W		12(A6),D3		* Descriptor --> D3
 		MOVE.W		14(A6),D4		* Tamaño --> D4
 		MOVE.L		#0,D5			* Inicialización D4 = 0
-		CMP.L		#0,D2			* Si tamaño = 0
+		CMP.L		#0,D4			* Si tamaño = 0
 		BEQ			PRINT_FIN
 		CMP.W		#0,D3
 		BEQ			PRINT_A			* Si descriptor = 0 escribe en A
