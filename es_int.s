@@ -360,7 +360,7 @@ SCAN:
 		CMP.B		#1,D1
 		BEQ			SCAN_B			* Si descriptor = 1 lee de B
 		MOVE.L		#$FFFFFFFF,D0	* Si no ERROR
-		BRA			SCAN2_FIN		* y sale de SCAN
+		BRA			SCAN_FIN		* y sale de SCAN
 		
 
 SCAN_A:	
