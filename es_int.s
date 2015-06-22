@@ -28,7 +28,7 @@ IVR     EQU     $effc19       * del vector de interrupción
 
 ******* Memoria *********
 
-ORG             $400
+    ORG         $400
 
 buffSA:			DS.B	2000    * Buffer SCAN A
 finSA:          DS.B    4       * Direccion de buffSA
