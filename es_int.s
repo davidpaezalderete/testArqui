@@ -25,25 +25,10 @@ TBB     EQU     $effc17       * buffer transmision B (escritura)
 RBB     EQU     $effc17       * buffer recepcion B (lectura)
 IVR     EQU     $effc19       * del vector de interrupción
 
-********* Punteros a utilizar ***************
-
-pSA:			DS.B	4   * Puntero SCAN A
-pSB:			DS.B	4   * Puntero SCAN B
-pPA:			DS.B	4   * Puntero PRINT A
-pPB: 			DS.B	4   * Puntero PRINT B
-pSARTI:		    DS.B	4   * Puntero RTI SCAN A
-pSBRTI:		    DS.B	4   * Puntero RTI SCAN B
-pPARTI:		    DS.B	4   * Puntero RTI PRINT A
-pPBRTI:		    DS.B	4   * Puntero RTI PRINT B
-pfinSA:         DS.B    4   * Puntero fin de buffer SCAN A
-pfinSB:         DS.B    4   * Puntero fin de buffer SCAN B
-pfinPA:         DS.B    4   * Puntero fin de buffer PRINT A
-pfinPB:         DS.B    4   * Puntero fin de buffer PRINT B
-
 
 ******* Memoria *********
 
-ORG $400
+ORG             $400
 
 buffSA:			DS.B	2000    * Buffer SCAN A
 finSA:          DS.B    4       * Direccion de buffSA
@@ -63,6 +48,20 @@ LIN_TBB:	DS.B	1		* Hay salto de linea en transmision B
 IMRcopia:	DS.B	2		* Copia de la máscara de interrupción
 
 ***************************
+********* Punteros a utilizar ***************
+
+pSA:			DS.B	4   * Puntero SCAN A
+pSB:			DS.B	4   * Puntero SCAN B
+pPA:			DS.B	4   * Puntero PRINT A
+pPB: 			DS.B	4   * Puntero PRINT B
+pSARTI:		    DS.B	4   * Puntero RTI SCAN A
+pSBRTI:		    DS.B	4   * Puntero RTI SCAN B
+pPARTI:		    DS.B	4   * Puntero RTI PRINT A
+pPBRTI:		    DS.B	4   * Puntero RTI PRINT B
+pfinSA:         DS.B    4   * Puntero fin de buffer SCAN A
+pfinSB:         DS.B    4   * Puntero fin de buffer SCAN B
+pfinPA:         DS.B    4   * Puntero fin de buffer PRINT A
+pfinPB:         DS.B    4   * Puntero fin de buffer PRINT B
 
 **************************** INIT **************************************************
 INIT:
