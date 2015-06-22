@@ -178,10 +178,10 @@ LB_R:
         MOVE.L      pSB,A1          * Carga puntero
         MOVE.L      pSBRTI,A2       * Carga puntero RTI
         CMP.L       A1,A2           * Se comparan los punteros
-        BNE         LA_RLEE         * Si son distintos leo
+        BNE         LB_RLEE         * Si son distintos leo
         MOVE.B      emptySB,D2      * Flag de vacio
         CMP.B       #1,D2           * Son iguales, buffer vacio?
-        BNE.L       LA_RLEE         * No son iguales, leo
+        BNE.L       LB_RLEE         * No son iguales, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer vacio
         BRA         L_FIN
 LB_RLEE:
@@ -393,7 +393,7 @@ SCB_LO:
         CMP.L       D5,D6
         BEQ         SCAN_FIN
         MOVE.L		#1,D0			* Un 01 en D0
-		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
+		BSR 		LEECAR			* Saltamos a leecar
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ			SCAN_FIN		* Nos salimos si error.
 		MOVE.B		D0,(A4)+		* El caracter leido,D0, lo metemos en A1
