@@ -232,7 +232,7 @@ L_FIN:
 
 ESCCAR:
 		CMP.L 		#0,D0
-		BEQ 		RA_R
+		BEQ 		EA_R
 		CMP.L 		#1,D0
 		BEQ 		EB_R
 		CMP.L 		#2,D0
