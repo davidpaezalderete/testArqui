@@ -43,13 +43,15 @@ pfinPB:         DS.B    4   * Puntero fin de buffer PRINT B
 
 ******* Memoria *********
 
+ORG $400
+
 buffSA:			DS.B	2000    * Buffer SCAN A
-buffSB:			DS.B	2000    * Buffer SCAN B
-buffPA:			DS.B	2000    * Buffer PRINT A
-buffPB:			DS.B	2000    * Buffer PRINT B
 finSA:          DS.B    4       * Direccion de buffSA
+buffSB:			DS.B	2000    * Buffer SCAN B
 finSB:          DS.B    4       * Direccion de buffSB
+buffPA:			DS.B	2000    * Buffer PRINT A
 finPA:          DS.B    4       * Direccion de buffPA
+buffPB:			DS.B	2000    * Buffer PRINT B
 finPB:          DS.B    4       * Direccion de buffPB
 emptySA:        DS.B	1		* Bit para comprobar si está vacío SA
 emptySB:        DS.B	1		* Bit para comprobar si está vacío SB
@@ -62,7 +64,7 @@ IMRcopia:	DS.B	2		* Copia de la máscara de interrupción
 
 ***************************
 
-**************************** INIT *************************************************************
+**************************** INIT **************************************************
 INIT:
         MOVE.B          #%00000011,MR1A     * 8 bits por carac. en A y solicita una int. por carac.
 		MOVE.B          #%00000000,MR1A     * Eco desactivado en A
@@ -115,20 +117,22 @@ INIT:
 ********** LEECAR **********
 
 LEECAR:
-        BTST        #0,D0
-        BNE         LB          * Si D0 es 1 voy a leer linea B
-
-LA:
-        BTST        #1,D0
-        BNE         LA_T        * Si D0 es 1 salta a LA_T
+		CMP.L 		#0,D0
+		BEQ 		LA_R
+		CMP.L 		#1,D0
+		BEQ 		LB_R
+		CMP.L 		#2,D0
+		BEQ			LA_T
+		CMP.L 		#3,D0
+		BEQ 		LB_T
 
 LA_R:
         MOVE.L      pSA,A1          * Carga puntero
         MOVE.L      pSARTI,A2       * Carga puntero RTI
         MOVE.L      pfinSA,A3       * PUNTERO DE fin
-        MOVE.B      emptySA,D2      * Flag de vacio
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_RLEE         * Si son distintos leo
+        MOVE.B      emptySA,D2      * Flag de vacio
         CMP.B       #1,D2           * Son iguales, buffer vacio?
         BNE.L       LA_RLEE         * No son iguales, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer vacio
@@ -150,9 +154,9 @@ LA_T:
         MOVE.L      pPA,A1          * Carga puntero
         MOVE.L      pPARTI,A2       * Carga puntero RTI
         MOVE.L      pfinPA,A3       * Carga puntero de fin
-        MOVE.B      fullPA,D2       * Flag de lleno
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_TLEE         * Si no son iguales, leo
+        MOVE.B      fullPA,D2       * Flag de lleno
         CMP.B       #0,D2           * Si lo son, buffer lleno?
         BNE         LA_TLEE         * Si no, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer lleno
@@ -170,17 +174,14 @@ LA_TAFIN:
         MOVE.B      #0,fullPA       * Flag
         BRA         L_FIN           * Salida
 
-LB:
-        BTST        #1,D0
-        BNE         LB_T            * Si D0 es 1 salta a LB_T
 
 LB_R:
         MOVE.L      pSB,A1          * Carga puntero
         MOVE.L      pSBRTI,A2       * Carga puntero RTI
         MOVE.L      pfinSB,A3       * PUNTERO DE fin
-        MOVE.B      emptySB,D2      * Flag de vacio
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_RLEE         * Si son distintos leo
+        MOVE.B      emptySB,D2      * Flag de vacio
         CMP.B       #1,D2           * Son iguales, buffer vacio?
         BNE.L       LA_RLEE         * No son iguales, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer vacio
@@ -202,9 +203,9 @@ LB_T:
         MOVE.L      pPB,A1          * Carga puntero
         MOVE.L      pPBRTI,A2       * Carga puntero RTI
         MOVE.L      pfinPB,A3       * Carga puntero de fin
-        MOVE.B      fullPB,D2       * Flag de lleno
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LB_TLEE         * Si no son iguales, leo
+        MOVE.B      fullPB,D2       * Flag de lleno
         CMP.B       #0,D2           * Si lo son, buffer lleno?
         BNE         LB_TLEE         * Si no, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer lleno
@@ -231,19 +232,21 @@ L_FIN:
 ********** ESCCAR **********
 
 ESCCAR:
-        BTST        #1,D0
-        BNE         EB
-
-EA:
-        BTST        #1,D0
-        BNE         EA_T
+		CMP.L 		#0,D0
+		BEQ 		RA_R
+		CMP.L 		#1,D0
+		BEQ 		EB_R
+		CMP.L 		#2,D0
+		BEQ			EA_T
+		CMP.L 		#3,D0
+		BEQ 		EB_T
 EA_R:
         MOVE.L		pSA,A1		    * Llevo pSA a A1
         MOVE.L		pSARTI,A2		* Llevo pRTISA a A2
         MOVE.L		pfinSA,A3		* Llevo puntero a A3
-        MOVE.B		emptySA,D2		* Llevo emptySA a D2
         CMP.L		A1,A2			* Comparo punteros
         BNE         EA_RESC			* Si no son iguales voy a EA_RESC para escribir normal
+        MOVE.B		emptySA,D2		* Llevo emptySA a D2
         CMP.B		#0,D2			* Miro si no está vacío el buffer
         BNE         EA_RESC         * Si los punteros son iguales y está vacío voy a EA_RESC
         MOVE.L		#$FFFFFFFF,D0
@@ -266,9 +269,9 @@ EA_T:
         MOVE.L		pPA,A1          * Llevo puntero a A1
         MOVE.L		pPARTI,A2		* Llevo puntero a A2
         MOVE.L		pfinPA,A3		* Llevo punter a A3
-        MOVE.B		fullPA,D2		* Llevo puntero a D2
         CMP.L		A1,A2			* Comparo punteros
         BNE         EA_TESC			* Si no son iguales voy a EA_TESC para escribir
+        MOVE.B		fullPA,D2		* Llevo puntero a D2
         CMP.B		#1,D2			* Miro si está lleno el buffer
         BNE         EA_TESC			* Si punteros son iguales y está lleno salto
         MOVE.L		#$FFFFFFFF,D0	* Si punteros son iguales y no está lleno devuelv
@@ -285,18 +288,15 @@ EA_TFIN:
         CMP.L		A1,A2			* Comparo punteros
         BNE         E_FIN			* Si no son iguales voy a E_FIN
         MOVE.B		#1,fullPA		* Si sí son iguales
-        BRa         E_FIN
+        BRA         E_FIN
 
-EB:
-        BTST        #1,D0
-        BNE         EB_T
 EB_R:
         MOVE.L		pSB,A1		* Llevo punteros a A1
         MOVE.L		pSBRTI,A2		* Llevo puntero a A2
         MOVE.L		pfinSB,A3		* Llevo puntero a A3
-        MOVE.B		emptySB,D2		* Llevo emptySA a D2
         CMP.L		A1,A2			* Comparo punteros
         BNE         EB_RESC			* Si no son iguales salto
+        MOVE.B		emptySB,D2		* Llevo emptySA a D2
         CMP.B		#0,D2			* Miro si no está vacío el buffer
         BNE         EB_RESC         * Si los punteros son iguales y está vacío voy a EB_RESC
         MOVE.L		#$FFFFFFFF,D0
@@ -319,9 +319,9 @@ EB_T:
         MOVE.L		pPB,A1		* Llevo puntero a A1
         MOVE.L		pPBRTI,A2		* Llevo puntero a A2
         MOVE.L		pfinPB,A3		* Llevo puntero a A3
-        MOVE.B		fullPB,D2		* Llevo fullPB a D2
         CMP.L		A1,A2			* Comparo punteros
         BNE         EB_TESC			* Si no son iguales salto
+        MOVE.B		fullPB,D2		* Llevo fullPB a D2
         CMP.B		#1,D2			* Miro si está lleno el buffer
         BNE         EB_TESC			* Si punteros son iguales y está lleno salto
         MOVE.L		#$FFFFFFFF,D0	* Si puntero son iguales y no está lleno devuelv
@@ -374,7 +374,7 @@ SCAN_A:
 SCA_LO:
         CMP.L       D5,D6
         BEQ         SCAN_FIN
-        MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
+        MOVE.L		#0,D0			* Un 00 en D0 para asegurarnos que esta vacio
 		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ			SCAN_FIN		* Nos salimos si error.
@@ -393,7 +393,7 @@ SCAN_B:
 SCB_LO:
         CMP.L       D5,D6
         BEQ         SCAN_FIN
-        MOVE.L		#0,D0			* Un 0 en D0 para asegurarnos que esta vacio
+        MOVE.L		#1,D0			* Un 01 en D0
 		BSR 		LEECAR			* Saltamos a leecar con los dos bits a 0.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ			SCAN_FIN		* Nos salimos si error.
@@ -428,7 +428,7 @@ PRINT:  LINK		A6,#0
 		
 PRINT_A:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
-		MOVE.L		#2,D0			* BSET.B 		#1,D0// BIT 0 = 0, BIT 1 = 1;
+		MOVE.L		#2,D0			* 10 en D0
         BSR         ESCCAR
 		CMP.B 		#0,D0
 		BEQ 		PR_A
@@ -452,7 +452,7 @@ FIN_PA:
 
 PRINT_B:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
-		MOVE.L		#3,D0			*BSET.B 		#1,D0// BIT 0 = 0, BIT 1 = 1;
+		MOVE.L		#3,D0			* 11 en D0
         BSR         ESCCAR
 		CMP.B 		#0,D0
 		BEQ 		PR_B
@@ -482,21 +482,23 @@ PRINT_FIN:
 
 **********************  LINEA  ******************************
 LINEA:
-		BTST		#0,D0			* Comprobamos el bit 0
-		BNE			LINE_B			* Si es 1 Linea de transmision B
-
-LINE_A:	
-		BTST		#1,D0			* Comprobamos el bit 1
-		BNE			LINA_T			* Si es 0 selecciona el buff de recepción
+		CMP.L 		#0,D0
+		BEQ 		LINA_R
+		CMP.L 		#1,D0
+		BEQ 		LINB_R
+		CMP.L 		#2,D0
+		BEQ			LINA_T
+		CMP.L 		#3,D0
+		BEQ 		LINB_T
 
 LINA_R:
         MOVE.L		pSA,A1		    * Cargamos el puntero que vamos a utilizar
 		MOVE.L 		pSARTI,A2		* Cargamos el puntero de SCAN
 		MOVE.L		pfinSA,A3		* Cargamos el final del buff
-        MOVE.B      emptySA,D2      * FLAG DE vacio
         MOVE.L      #0,D0
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINA_RN         * Si no son iguales se sigue en LINA_RN
+        MOVE.B      emptySA,D2      * FLAG DE vacio
         CMP.B       #1,D2           * Si no, se mira si buff vacio
         BNE         LINA_RN         *
         BRA         LI_FIN
@@ -520,10 +522,10 @@ LINA_T:
         MOVE.L      pPA,A1          * Carga puntero
         MOVE.L      pPARTI,A2
         MOVE.L      pfinPA,A3
-        MOVE.B      fullPA,D2       * Flag de buffer lleno
         MOVE.L		#0,D0
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINA_TN         * SI no son iguales se sigue
+        MOVE.B      fullPA,D2       * Flag de buffer lleno
         CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
         BNE         LINA_TN         * Si flag lleno, salida
         MOVE.L      #0,D0           * Al salir, 0 -> D0
@@ -552,10 +554,10 @@ LINB_R:
         MOVE.L		pSB,A1		    * Cargamos el puntero que vamos a utilizar
 		MOVE.L 		pSBRTI,A2		* Cargamos el puntero de SCAN
 		MOVE.L		pfinSB,A3		* Cargamos el final del buff
-        MOVE.B      emptySB,D2      * FLAG DE vacio
         MOVE.L		#0,D0
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINB_RN         * Si no son iguales se sigue en LINA_RN
+        MOVE.B      emptySB,D2      * FLAG DE vacio
         CMP.B       #1,D2           * Si no, se mira si buff vacio
         BNE         LINB_RN         *
         BRA         LI_FIN
@@ -579,10 +581,10 @@ LINB_T:
         MOVE.L      pPB,A1          * Carga puntero
         MOVE.L      pPBRTI,A2
         MOVE.L      pfinPB,A3
-        MOVE.B      fullPB,D2       * Flag de buffer lleno
         MOVE.L      #0,D0           * Contador
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINB_TN         * SI no son iguales se sigue
+        MOVE.B      fullPB,D2       * Flag de buffer lleno
         CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
         BNE         LINB_TN         * Si flag lleno, salida
         MOVE.L      #0,D0           * Al salir, 0 -> D0
@@ -639,12 +641,12 @@ T_RDY_A:
         MOVE.B		LIN_TBA,D2
 		CMP.B		#1,D2
 		BNE         TR_A
-        MOVE.B      #10,TBA
         MOVE.B      #0,LIN_TBA
+        MOVE.B      #10,TBA
         BRA         RTI_FIN
 
 TR_A:
-        MOVE.L		#2,D0			* D0 = 0
+        MOVE.L		#2,D0			* BIT 0 = 0, BIT 1 = 1;
         BSR         LINEA
         CMP.L       #0,D0
         BEQ         FIN_TA
@@ -669,16 +671,16 @@ T_RDY_B:
         MOVE.B		LIN_TBB,D2
 		CMP.B		#1,D2
 		BNE         TR_B
-        MOVE.B      #10,TBB
         MOVE.B      #0,LIN_TBB
+        MOVE.B      #10,TBB
         BRA         RTI_FIN
 
 TR_B:
-        MOVE.L		#3,D0			* D0 = 0
+        MOVE.L		#3,D0			* BIT 0 = 1, BIT 1 = 1;
         BSR         LINEA
         CMP.L       #0,D0
         BEQ         FIN_TB
-		MOVE.L		#3,D0			* BIT 0 = 0, BIT 1 = 1;
+		MOVE.L		#3,D0			* BIT 0 = 1, BIT 1 = 1;
 		BSR 		LEECAR			* Salto a leecar.
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ 		FIN_TB			* Si error fin.
@@ -697,9 +699,9 @@ FIN_TB:
 
 R_RDY_A:
 		MOVE.B		RBA,D1			* Cogemos el caracter del puerto de recepción
-		MOVE.L		#0,D0			* D0 = 0
+		MOVE.L		#0,D0			* BIT 0 = 0, BIT 1 = 0;
 		BSR			ESCCAR			* Vamos a rutina ESCCAR
-        CMP.L       #0,D0
+        CMP.L       #0,D0           * BIT 0 = 0, BIT 1 = 0;
         BEQ         RTI_FIN
         MOVE.B      #0,emptySA
 		BRA			RTI_FIN			* Si error, fin.
@@ -707,12 +709,12 @@ R_RDY_A:
 
 R_RDY_B:
 		MOVE.B		RBB,D1			* Cogemos el caracter del puerto de recepción
-		MOVE.B      #1,D0
-		BSR		ESCCAR			* Vamos a rutina ESCCAR
+		MOVE.B      #1,D0           * BIT 0 = 1, BIT 1 = 0;
+		BSR		ESCCAR              * Vamos a rutina ESCCAR
         CMP.L       #0,D0
         BEQ         RTI_FIN
         MOVE.B      #0,emptySB
-        BRA		RTI_FIN			* si error fin.
+        BRA		RTI_FIN             * si error fin.
 
 
 
