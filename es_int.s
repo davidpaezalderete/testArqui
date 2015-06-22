@@ -758,7 +758,7 @@ BUCPR:
 	MOVE.L #BUFFER,DIRLEC * Direcci ́on de lectura = comienzo del buffer
 OTRAL:
 	MOVE.W #TAML,-(A7) * Tama~no m ́aximo de la l ́ınea
-	MOVE.W #DESB,-(A7) * Puerto A
+	MOVE.W #DESA,-(A7) * Puerto A
 	MOVE.L DIRLEC,-(A7) * Direcci ́on de lectura
 ESPL:
 	BSR SCAN
@@ -774,7 +774,7 @@ OTRAE:
 	MOVE.W #TAMB,TAME * Tama~no de escritura = Tama~no de bloque
 ESPE:
 	MOVE.W TAME,-(A7) * Tama~no de escritura
-	MOVE.W #DESA,-(A7) * Puerto B
+	MOVE.W #DESB,-(A7) * Puerto B
 	MOVE.L DIRLEC,-(A7) * Direcci ́on de lectura
 	BSR PRINT
 	ADD.L #8,A7 * Restablece la pila
