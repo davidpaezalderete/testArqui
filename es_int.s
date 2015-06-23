@@ -124,6 +124,9 @@ LEECAR:
 		BEQ			LA_T
 		CMP.L 		#3,D0
 		BEQ 		LB_T
+        MOVE.L      #$FFFFFFFF,D0
+        BRA         L_FIN
+
 
 LA_R:
         MOVE.L      pSA,A1          * Carga puntero
@@ -239,6 +242,8 @@ ESCCAR:
 		BEQ			EA_T
 		CMP.L 		#3,D0
 		BEQ 		EB_T
+        MOVE.L      #$FFFFFFFF,D0
+        BRA         L_FIN
 EA_R:
         MOVE.L		pSA,A1		    * Llevo pSA a A1
         MOVE.L		pSARTI,A2		* Llevo pRTISA a A2
@@ -415,24 +420,24 @@ PRINT:  LINK		A6,#0
 		MOVE.L		8(A6),A4		* Dirección del buffer.
 		MOVE.W		12(A6),D3		* Descriptor --> D3
 		MOVE.W		14(A6),D4		* Tamaño --> D4
-		MOVE.L		#0,D5			* Inicialización D4 = 0
+		MOVE.L		#0,D5			* Inicialización D5 = 0
 		CMP.L		#0,D4			* Si tamaño = 0
 		BEQ			PRINT_FIN
 		CMP.W		#0,D3
 		BEQ			PRINT_A			* Si descriptor = 0 escribe en A
 		CMP.W		#1,D3
 		BEQ			PRINT_B			* Si descriptor = 1 escribe en B
-		MOVE.L		#$FFFFFFFF,D0	* Si no ERROR,
+		MOVE.L		#$FFFFFFFF,D5	* Si no ERROR,
 		BRA			PRINT_FIN		* y sale de PRINT.
 		
 PRINT_A:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
 		MOVE.L		#2,D0			* 10 en D0
         BSR         ESCCAR
-		CMP.B 		#0,D0
+		CMP.L 		#0,D0
 		BEQ 		PR_A
-		CMP.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
-		BEQ			FIN_PA			* Nos salimos
+		MOVE.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
+		BRA			FIN_PA			* Nos salimos
 
 PR_A:
         ADD.L		#1,D5			* Contador ++
@@ -447,7 +452,7 @@ FIN_PA:
 		BSET.B		#0,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones
-		BRA PRINT_FIN
+		BRA         PRINT_FIN
 
 PRINT_B:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
@@ -455,8 +460,8 @@ PRINT_B:
         BSR         ESCCAR
 		CMP.B 		#0,D0
 		BEQ 		PR_B
-		CMP.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
-		BEQ			FIN_PB			* Nos salimos
+		MOVE.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
+		BRA         FIN_PB			* Nos salimos
 
 PR_B:
         ADD.L		#1,D5			* Contador ++
@@ -803,5 +808,36 @@ PRIV_VIOLT:
 	BREAK * Privilege violation handler
 	NOP
 
+
+
+PR39:
+    BSR INIT
+    LEA pSA,A1
+    MOVE.L #1,D1
+	MOVE.B D1,(A1)+ 
+	MOVE.L #2,D1
+	MOVE.B D1,(A1)+	
+	MOVE.L #3,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #4,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #5,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #6,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #7,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #8,D1
+	MOVE.B D1,(A1)+
+	MOVE.L #9,D1	
+	MOVE.B D1,(A1)+
+	MOVE.L #$0D,D1
+	MOVE.B D1,(A1)+ 
+	MOVE.L A1,punSA
+    MOVE.W #10,-(A7) * Tama~no de escritura
+	MOVE.W #DESA,-(A7) * Puerto B
+	MOVE.L DIRLEC,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+    BREAK
 
 
