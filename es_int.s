@@ -7,7 +7,7 @@
 
 	ORG	$0
 	DC.L	$8000		* Inicio de Pila
-	DC.L	INICIO		* PC al inicio de PPAL1
+	DC.L	PR39		* PC al inicio de PPAL1
 
 ********* Definición de los registros *********************
 
@@ -812,8 +812,10 @@ PRIV_VIOLT:
 
 PR39:
     BSR INIT
-    LEA pSA,A1
-    MOVE.L #1,D1
+    MOVE.L pSA,A1
+    MOVE.L pSA,A2
+    MOVE.L		#$FFFFFFFF,D0	
+ 	MOVE.L #1,D1
 	MOVE.B D1,(A1)+ 
 	MOVE.L #2,D1
 	MOVE.B D1,(A1)+	
@@ -831,12 +833,14 @@ PR39:
 	MOVE.B D1,(A1)+
 	MOVE.L #9,D1	
 	MOVE.B D1,(A1)+
+	MOVE.L #0,D1	
+	MOVE.B D1,(A1)+
 	MOVE.L #$0D,D1
 	MOVE.B D1,(A1)+ 
-	MOVE.L A1,punSA
+	MOVE.L A1,pSA
     MOVE.W #10,-(A7) * Tama~no de escritura
 	MOVE.W #DESA,-(A7) * Puerto B
-	MOVE.L DIRLEC,-(A7) * Direcci ́on de lectura
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
     BREAK
 
