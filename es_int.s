@@ -406,7 +406,8 @@ SCB_LO:
 		BRA			SCB_LO			* Vuelvo a Scan
 
 SCAN_FIN:
-		MOVE.L 		D5,D0
+        MOVE.L      #0,D0           * Limpia D0
+        MOVE.L 		D5,D0
         UNLK 		A6
 		RTS
 
@@ -479,7 +480,8 @@ FIN_PB:
         BRA PRINT_FIN
 
 PRINT_FIN:
-        MOVE.L 		D5,D0
+        MOVE.L      #0,D0           * Limpia D0
+        MOVE.L 		D5,D0           * Mueve el contador a D0
         UNLK		A6
 		RTS  
 **************************** FIN PRINT ******************************************************
