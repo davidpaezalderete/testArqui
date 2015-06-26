@@ -135,7 +135,7 @@ LA_R:
         BNE         LA_RLEE         * Si son distintos leo
         MOVE.B      emptySA,D2      * Flag de vacio
         CMP.B       #1,D2           * Son iguales, buffer vacio?
-        BNE.L       LA_RLEE         * No son iguales, leo
+        BNE       LA_RLEE         * No son iguales, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer vacio
         BRA         L_FIN
 LA_RLEE:
@@ -363,7 +363,7 @@ SCAN:
 		BEQ			SCAN_A			* Si descriptor = 0 lee de A
 		CMP.B		#1,D3
 		BEQ			SCAN_B			* Si descriptor = 1 lee de B
-		MOVE.L		#$FFFFFFFF,D0	* Si no ERROR
+		MOVE.L		#$FFFFFFFF,D5	* Si no ERROR
 		BRA			SCAN_FIN		* y sale de SCAN
 		
 
@@ -450,7 +450,7 @@ PR_A:
 
 FIN_PA:
 		MOVE.W		#$2700,SR		* Inhibimos interrupciones
-		BSET.B		#0,IMRcopia		* Habilitamos las interrupciones en A
+		BSET		#0,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones
 		BRA         PRINT_FIN
@@ -474,7 +474,7 @@ PR_B:
 
 FIN_PB:
         MOVE.W		#$2700,SR		* Inhibimos interrupciones
-		BSET.B		#4,IMRcopia		* Habilitamos las interrupciones en A
+		BSET		#4,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones        
         BRA PRINT_FIN
@@ -533,7 +533,7 @@ LINA_T:
         BNE         LINA_TN         * SI no son iguales se sigue
         MOVE.B      fullPA,D2       * Flag de buffer lleno
         CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
-        BNE         LINA_TN         * Si flag lleno, salida
+        BEQ         LINA_TN         * Si flag lleno, salida
         MOVE.L      #0,D0           * Al salir, 0 -> D0
         BRA         LI_FIN          * Salida
 
@@ -592,7 +592,7 @@ LINB_T:
         BNE         LINB_TN         * SI no son iguales se sigue
         MOVE.B      fullPB,D2       * Flag de buffer lleno
         CMP.B       #1,D2           * Si lo son, se comprueba el flag de lleno
-        BNE         LINB_TN         * Si flag lleno, salida
+        BEQ         LINB_TN         * Si flag lleno, salida
         MOVE.L      #0,D0           * Al salir, 0 -> D0
         BRA         LI_FIN          * Salida
 
@@ -621,16 +621,19 @@ LI_FIN:
 
 **************************** RTI ************************************************************
 RTI:
-		MOVE.W		D0,-(A7)		* Guardamos los registros utilizados en SCAN y PRINT
-		MOVE.W		D1,-(A7)
-		MOVE.W		D2,-(A7)
-		MOVE.W		D3,-(A7)
-		MOVE.W		D4,-(A7)
-		MOVE.W		D5,-(A7)
+		MOVE.L		D0,-(A7)		* Guardamos los registros utilizados en SCAN y PRINT
+		MOVE.L		D1,-(A7)
+		MOVE.L		D2,-(A7)
+		MOVE.L		D3,-(A7)
+		MOVE.L		D4,-(A7)
+		MOVE.L		D5,-(A7)
+        MOVE.L		D6,-(A7)
+        MOVE.L		D7,-(A7)
 		MOVE.L		A1,-(A7)
 		MOVE.L		A2,-(A7)
 		MOVE.L		A3,-(A7)
 		MOVE.L		A4,-(A7)
+        MOVE.L		A5,-(A7)
 		MOVE.B		IMRcopia,D1		* D1 <-- copia de la máscara de interrupción
 		AND.B		IMR,D1			* D1 <-- IMR ^ IMRcopia
 		BTST		#0,D1			* Comprobamos el bit 0
@@ -647,8 +650,8 @@ T_RDY_A:
         MOVE.B		LIN_TBA,D2
 		CMP.B		#1,D2
 		BNE         TR_A
-        MOVE.B      #0,LIN_TBA
         MOVE.B      #10,TBA
+        MOVE.B      #0,LIN_TBA
         BRA         RTI_FIN
 
 TR_A:
@@ -668,7 +671,7 @@ TR_A:
 
 FIN_TA:        	
         MOVE.W		#$2700,SR		* Si no hay más caracteres inhibo interrupciones
-        BCLR.B		#0,IMRcopia		* Deshabilitamos interrupciones en la linea A
+        BCLR		#0,IMRcopia		* Deshabilitamos interrupciones en la linea A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
         MOVE.W		#$2000,SR		* Permito de nuevo las interrupciones
 		BRA			RTI_FIN			* Saltamos al final de la rti
@@ -677,8 +680,8 @@ T_RDY_B:
         MOVE.B		LIN_TBB,D2
 		CMP.B		#1,D2
 		BNE         TR_B
-        MOVE.B      #0,LIN_TBB
         MOVE.B      #10,TBB
+        MOVE.B      #0,LIN_TBB
         BRA         RTI_FIN
 
 TR_B:
@@ -691,14 +694,14 @@ TR_B:
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ 		FIN_TB			* Si error fin.
 		MOVE.B		D0,TBB			* Introducimos el caracter en la linea A de transmisión.
-		CMP.B 		#13,D0
+		CMP.L 		#13,D0
         BNE         RTI_FIN
         MOVE.B      #1,LIN_TBB
 		BRA 		RTI_FIN			* Si son iguales hemos terminado
 		
 FIN_TB:       
         MOVE.W		#$2700,SR		* Si no hay más caracteres inhibo interrupciones
-        BCLR.B		#4,IMRcopia		* Deshabilitamos interrupciones en la linea A
+        BCLR		#4,IMRcopia		* Deshabilitamos interrupciones en la linea A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
         MOVE.W		#$2000,SR		* Permito de nuevo las interrupciones
 		BRA			RTI_FIN			* Saltamos al final de la rti
@@ -722,16 +725,19 @@ R_RDY_B:
         BRA		RTI_FIN             * si error fin.
 
 RTI_FIN:
-		MOVE.L		(A7)+,A4		* Restauramos los registros
+        MOVE.L		(A7)+,A5
+        MOVE.L		(A7)+,A4		* Restauramos los registros
 		MOVE.L		(A7)+,A3
 		MOVE.L		(A7)+,A2
 		MOVE.L		(A7)+,A1
-		MOVE.W		(A7)+,D5
-		MOVE.W		(A7)+,D4
-		MOVE.W		(A7)+,D3
-		MOVE.W		(A7)+,D2
-		MOVE.W		(A7)+,D1
-		MOVE.W		(A7)+,D0
+        MOVE.L		(A7)+,D7
+        MOVE.L		(A7)+,D6
+		MOVE.L		(A7)+,D5
+		MOVE.L		(A7)+,D4
+		MOVE.L		(A7)+,D3
+		MOVE.L		(A7)+,D2
+		MOVE.L		(A7)+,D1
+		MOVE.L		(A7)+,D0
 		RTE
 
 
