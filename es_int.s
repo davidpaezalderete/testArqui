@@ -7,7 +7,7 @@
 
 	ORG	$0
 	DC.L	$8000		* Inicio de Pila
-	DC.L	PR42		* PC al inicio de PPAL1
+	DC.L	INICIO		* PC al inicio de PPAL1
 
 ********* Definición de los registros *********************
 
