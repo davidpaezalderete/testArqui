@@ -129,15 +129,15 @@ LEECAR:
 
 
 LA_R:
-        MOVE.L      pSA,A1          * Carga puntero
-        MOVE.L      pSARTI,A2       * Carga puntero RTI
+        MOVE.L      pSA,A1          * Cargo puntero
+        MOVE.L      pSARTI,A2       * Cargo puntero RTI
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_RLEE         * Si son distintos leo
         MOVE.B      emptySA,D2      * Flag de vacio
         CMP.B       #1,D2           * Son iguales, buffer vacio?
-        BNE       LA_RLEE         * No son iguales, leo
+        BNE         LA_RLEE         * No son iguales, leo
         MOVE.L      #$FFFFFFFF,D0   * Punteros iguales y/o buffer vacio
-        BRA         L_FIN
+        BRA         L_FIN           * Salto a fin
 LA_RLEE:
         MOVE.B      (A1)+,D0        * Lee el caracter en D0
         MOVE.L      A1,pSA          * Actualiza puntero pSA
@@ -145,7 +145,7 @@ LA_RLEE:
         CMP.L       A1,A3           * Compara tras leer
         BNE         LA_RFIN         * Si no son iguales empiezo a salir
         LEA         buffSA,A1       * Si son iguales actualiza el puntero al principio
-        MOVE.L      A1,pSA
+        MOVE.L      A1,pSA          * Actualizo puntero
 LA_RFIN:
         CMP.L       A1,A2           * Compara con el pRTI
         BNE         L_FIN           * Si no son iguales sale
@@ -285,7 +285,7 @@ EA_TESC:
         MOVE.L		A1,pPA		    * Actualizo puntero
         MOVE.L		pfinPA,A3		* Llevo punter a A3
         CMP.L		A1,A3			* Miro si he llegado al final
-        BNE         EA_TFIN		    *   Si no, salto
+        BNE         EA_TFIN		    * Si no, salto
         LEA         buffPA,A1		* Si he llegado al final llevo buffPA a A1
         MOVE.L		A1,pPA		    * Y actualizo puntero
 EA_TFIN:
@@ -320,7 +320,7 @@ EB_RFIN:
         BRA         E_FIN			* Y salto a E_FIN
 
 EB_T:
-        MOVE.L		pPB,A1		* Llevo puntero a A1
+        MOVE.L		pPB,A1          * Llevo puntero a A1
         MOVE.L		pPBRTI,A2		* Llevo puntero a A2
         CMP.L		A1,A2			* Comparo punteros
         BNE         EB_TESC			* Si no son iguales salto
@@ -435,18 +435,18 @@ PRINT_A:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
 		MOVE.L		#2,D0			* 10 en D0
         BSR         ESCCAR
-		CMP.L 		#0,D0
-		BEQ 		PR_A
-		MOVE.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
+		CMP.L 		#0,D0           * Se compara D0 de salida
+		BEQ 		PR_A            * Si no hay errores siguen en PR_A
+		MOVE.L		#$FFFFFFFF,D5	* Si d0 != 0
 		BRA			FIN_PA			* Nos salimos
 
 PR_A:
         ADD.L		#1,D5			* Contador ++
-        CMP.L       #13,D1
-        BEQ         FIN_PA
-        CMP.L       D4,D5
-        BEQ         FIN_PA
-		BRA 		PRINT_A
+        CMP.L       #13,D1          * Comparo bit leido con carro
+        BEQ         FIN_PA          * si son iguales se deja de imprimir
+        CMP.L       D4,D5           * comparo contadores
+        BEQ         FIN_PA          * Si son iguales
+		BRA 		PRINT_A         * Si no, bucle
 
 FIN_PA:
 		MOVE.W		#$2700,SR		* Inhibimos interrupciones
@@ -458,19 +458,19 @@ FIN_PA:
 PRINT_B:
 		MOVE.B		(A4)+,D1		* D1 caracter a escribir por ESCCAR
 		MOVE.L		#3,D0			* 11 en D0
-        BSR         ESCCAR
-		CMP.B 		#0,D0
-		BEQ 		PR_B
-		MOVE.L		#$FFFFFFFF,D5	* Si d0 = #$FFFFFFFF buffer lleno
+        BSR         ESCCAR          *
+		CMP.B 		#0,D0           * compruebo bit de salida
+		BEQ 		PR_B            * si no hay errores se siguen pr_b
+		MOVE.L		#$FFFFFFFF,D5	* Si d0 !=0
 		BRA         FIN_PB			* Nos salimos
 
 PR_B:
         ADD.L		#1,D5			* Contador ++
-        CMP.L       #13,D1
-        BEQ         FIN_PB
-        CMP.L       D4,D5
-        BEQ         FIN_PB
-		BRA 		PRINT_B
+        CMP.L       #13,D1          * Se compara bit leido con carro
+        BEQ         FIN_PB          * Si es asi se sale
+        CMP.L       D4,D5           * se compara contador
+        BEQ         FIN_PB          * si son iguales se sale
+		BRA 		PRINT_B         * si no bucle
 
 FIN_PB:
         MOVE.W		#$2700,SR		* Inhibimos interrupciones
@@ -498,10 +498,10 @@ LINEA:
 		BEQ 		LINB_T
 
 LINA_R:
-        MOVE.L		pSA,A1		    * Cargamos el puntero que vamos a utilizar
-		MOVE.L 		pSARTI,A2		* Cargamos el puntero de SCAN
-		MOVE.L		pfinSA,A3		* Cargamos el final del buff
-        MOVE.L      #0,D0
+        MOVE.L		pSA,A1		    * Cargo el puntero que vamos a utilizar
+		MOVE.L 		pSARTI,A2		* Cargo el puntero de SCAN
+		MOVE.L		pfinSA,A3		* Cargo el final del buff
+        MOVE.L      #0,D0           * Limpio contador de caracteres
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LINA_RN         * Si no son iguales se sigue en LINA_RN
         MOVE.B      emptySA,D2      * FLAG DE vacio
