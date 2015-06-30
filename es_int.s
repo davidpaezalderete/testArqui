@@ -888,7 +888,7 @@ PR42_BUC:
 	MOVE.B D1,(A1)+ 
 	MOVE.L A1,pSB
     MOVE.W #10,-(A7) * Tama~no de escritura
-	MOVE.W #DESA,-(A7) * Puerto B
+	MOVE.W #1,-(A7) * Puerto B
 	MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
     BREAK
