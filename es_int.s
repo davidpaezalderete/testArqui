@@ -7,7 +7,7 @@
 
 	ORG	$0
 	DC.L	$8000		* Inicio de Pila
-	DC.L	INICIO		* PC al inicio de PPAL1
+	DC.L	PR31		* PC al inicio de PPAL1
 
 ********* Definición de los registros *********************
 
@@ -892,3 +892,71 @@ PR42_BUC:
 	MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
     BREAK
+
+PR31:
+    *ORG     	$8000
+    *buff31:     DS.B	2000
+    *pbuff31:	DS.B	4
+    BSR INIT
+        MOVE.L pSB,A1
+    MOVE.L #95,D2
+    MOVE.L #0,D3
+PR31_BUC:
+    	ADD.L  #1,D3
+    	MOVE.L #1,D1
+	MOVE.B D1,RBB
+	MOVE.L #2,D1
+	MOVE.B D1,RBB
+	MOVE.L #3,D1
+	MOVE.B D1,RBB
+	MOVE.L #4,D1
+	MOVE.B D1,RBB
+	MOVE.L #5,D1
+	MOVE.B D1,RBB
+	MOVE.L #6,D1
+	MOVE.B D1,RBB
+	MOVE.L #7,D1
+	MOVE.B D1,RBB
+	MOVE.L #8,D1
+	MOVE.B D1,RBB
+	MOVE.L #9,D1
+	MOVE.B D1,RBB
+	MOVE.L #0,D1
+	MOVE.B D1,RBB
+	MOVE.L #1,D1
+	MOVE.B D1,RBB
+	MOVE.L #2,D1
+	MOVE.B D1,RBB
+	MOVE.L #3,D1
+	MOVE.B D1,RBB
+	MOVE.L #4,D1
+	MOVE.B D1,RBB
+	MOVE.L #5,D1
+	MOVE.B D1,RBB
+	MOVE.L #6,D1
+	MOVE.B D1,RBB
+	MOVE.L #7,D1
+	MOVE.B D1,RBB
+	MOVE.L #8,D1
+	MOVE.B D1,RBB
+	MOVE.L #9,D1
+	MOVE.B D1,RBB
+	MOVE.L #0,D1
+	MOVE.B D1,RBB
+    CMP.L  D3,D2
+    BGT    PR42_BUC
+	MOVE.L #$0D,D1
+	MOVE.B D1,RBB 
+    *MOVE.L	buff31,pbuff31
+    MOVE.L	#1,D0
+    MOVE.W #1901,-(A7) * Tama~no de escritura
+    MOVE.L 	D0,-(A7)
+    MOVE.L	pSB,-(A7)
+    BSR 	SCAN
+    BREAK
+
+
+
+
+
+
