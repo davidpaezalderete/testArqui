@@ -131,6 +131,7 @@ LEECAR:
 LA_R:
         MOVE.L      pSA,A1          * Cargo puntero
         MOVE.L      pSARTI,A2       * Cargo puntero RTI
+        MOVE.L      pfinSA,A3       * PUNTERO DE fin
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_RLEE         * Si son distintos leo
         MOVE.B      emptySA,D2      * Flag de vacio
@@ -141,7 +142,6 @@ LA_R:
 LA_RLEE:
         MOVE.B      (A1)+,D0        * Lee el caracter en D0
         MOVE.L      A1,pSA          * Actualiza puntero pSA
-        MOVE.L      pfinSA,A3       * PUNTERO DE fin
         CMP.L       A1,A3           * Compara tras leer
         BNE         LA_RFIN         * Si no son iguales empiezo a salir
         LEA         buffSA,A1       * Si son iguales actualiza el puntero al principio
@@ -155,6 +155,7 @@ LA_RFIN:
 LA_T:
         MOVE.L      pPA,A1          * Carga puntero
         MOVE.L      pPARTI,A2       * Carga puntero RTI
+        MOVE.L      pfinPA,A3       * Carga puntero de fin
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LA_TLEE         * Si no son iguales, leo
         MOVE.B      fullPA,D2       * Flag de lleno
@@ -165,7 +166,6 @@ LA_T:
 LA_TLEE:
         MOVE.B      (A2)+,D0        * Lee el caracter en d0
         MOVE.L      A2,pPARTI       * Actualiza Puntero
-        MOVE.L      pfinPA,A3       * Carga puntero de fin
         CMP.L       A2,A3           * Compara
         BNE         LA_TAFIN        * Si no son iguales, empiezo a salir
         LEA         buffPA,A2       * Actualiza puntero al principio
@@ -180,6 +180,7 @@ LA_TAFIN:
 LB_R:
         MOVE.L      pSB,A1          * Carga puntero
         MOVE.L      pSBRTI,A2       * Carga puntero RTI
+        MOVE.L      pfinSB,A3       * PUNTERO DE fin
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LB_RLEE         * Si son distintos leo
         MOVE.B      emptySB,D2      * Flag de vacio
@@ -190,7 +191,6 @@ LB_R:
 LB_RLEE:
         MOVE.B      (A1)+,D0        * Lee el caracter en D0
         MOVE.L      A1,pSB          * Actualiza puntero pSA
-        MOVE.L      pfinSB,A3       * PUNTERO DE fin
         CMP.L       A1,A3           * Compara tras leer
         BNE         LB_RFIN         * Si no son iguales empiezo a salir
         LEA         buffSB,A1       * Si son iguales actualiza el puntero al principio
@@ -204,6 +204,7 @@ LB_RFIN:
 LB_T:
         MOVE.L      pPB,A1          * Carga puntero
         MOVE.L      pPBRTI,A2       * Carga puntero RTI
+        MOVE.L      pfinPB,A3       * Carga puntero de fin
         CMP.L       A1,A2           * Se comparan los punteros
         BNE         LB_TLEE         * Si no son iguales, leo
         MOVE.B      fullPB,D2       * Flag de lleno
@@ -214,7 +215,6 @@ LB_T:
 LB_TLEE:
         MOVE.B      (A2)+,D0        * Lee el caracter en d0
         MOVE.L      A2,pPBRTI       * Actualiza Puntero
-        MOVE.L      pfinPB,A3       * Carga puntero de fin
         CMP.L       A2,A3           * Compara
         BNE         LB_TBFIN        * Si no son iguales, empiezo a salir
         LEA         buffPB,A2       * Actualiza puntero al principio
@@ -247,6 +247,7 @@ ESCCAR:
 EA_R:
         MOVE.L		pSA,A1		    * Llevo pSA a A1
         MOVE.L		pSARTI,A2		* Llevo pRTISA a A2
+        MOVE.L		pfinSA,A3		* Llevo puntero a A3
         CMP.L		A1,A2			* Comparo punteros
         BNE         EA_RESC			* Si no son iguales voy a EA_RESC para escribir normal
         MOVE.B		emptySA,D2		* Llevo emptySA a D2
@@ -258,7 +259,6 @@ EA_RESC:
         MOVE.B		D1,(A2)+		* Llevo el carácter a A2 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
         MOVE.L		A2,pSARTI		* Actualizo puntero
-        MOVE.L		pfinSA,A3		* Llevo puntero a A3
         CMP.L		A2,A3			* Miro si he llegado al final
         BNE         EA_RFIN         * Si no, salto
         LEA         buffSA,A2		* Si he llegado al final llevo buffSA a A2
@@ -272,6 +272,7 @@ EA_RFIN:
 EA_T:
         MOVE.L		pPA,A1          * Llevo puntero a A1
         MOVE.L		pPARTI,A2		* Llevo puntero a A2
+        MOVE.L		pfinPA,A3		* Llevo punter a A3
         CMP.L		A1,A2			* Comparo punteros
         BNE         EA_TESC			* Si no son iguales voy a EA_TESC para escribir
         MOVE.B		fullPA,D2		* Llevo puntero a D2
@@ -283,7 +284,6 @@ EA_TESC:
         MOVE.B		D1,(A1)+		* Llevo el carácter a A1 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
         MOVE.L		A1,pPA		    * Actualizo puntero
-        MOVE.L		pfinPA,A3		* Llevo punter a A3
         CMP.L		A1,A3			* Miro si he llegado al final
         BNE         EA_TFIN		    * Si no, salto
         LEA         buffPA,A1		* Si he llegado al final llevo buffPA a A1
@@ -297,6 +297,7 @@ EA_TFIN:
 EB_R:
         MOVE.L		pSB,A1		* Llevo punteros a A1
         MOVE.L		pSBRTI,A2		* Llevo puntero a A2
+        MOVE.L		pfinSB,A3		* Llevo puntero a A3
         CMP.L		A1,A2			* Comparo punteros
         BNE         EB_RESC			* Si no son iguales salto
         MOVE.B		emptySB,D2		* Llevo emptySA a D2
@@ -308,7 +309,6 @@ EB_RESC:
         MOVE.B		D1,(A2)+		* Llevo el carácter a A2 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
         MOVE.L		A2,pSBRTI		* Actualizo puntero
-        MOVE.L		pfinSB,A3		* Llevo puntero a A3
         CMP.L		A2,A3			* Miro si he llegado al final
         BNE         EB_RFIN         * Si no, salto
         LEA         buffSB,A2		* Si he llegado al final llevo buffSA a A2 (buffer circular)
@@ -322,6 +322,7 @@ EB_RFIN:
 EB_T:
         MOVE.L		pPB,A1          * Llevo puntero a A1
         MOVE.L		pPBRTI,A2		* Llevo puntero a A2
+        MOVE.L		pfinSB,A3		* Llevo puntero a A3
         CMP.L		A1,A2			* Comparo punteros
         BNE         EB_TESC			* Si no son iguales salto
         MOVE.B		fullPB,D2		* Llevo fullPB a D2
@@ -333,7 +334,6 @@ EB_TESC:
         MOVE.B		D1,(A1)+		* Llevo el carácter a A1 y lo incremento
         MOVE.L		#0,D0			* Pongo un 0 en D0 ya que se ha escrito el carácter correctamente
         MOVE.L		A1,pPB          * Actualizo puntero
-        MOVE.L		pfinPB,A3		* Llevo puntero a A3
         CMP.L		A1,A3			* Miro si he llegado al final
         BNE         EA_TFIN         * Si no, salto
         LEA         buffPB,A1		* Si he llegado al final llevo buffPA a A1
@@ -477,7 +477,7 @@ FIN_PB:
 		BSET		#4,IMRcopia		* Habilitamos las interrupciones en A
 		MOVE.B		IMRcopia,IMR	* Actualizamos IMR
 		MOVE.W		#$2000,SR		* Permitimos de nuevo las interrupciones        
-        BRA PRINT_FIN
+        BRA         PRINT_FIN
 
 PRINT_FIN:
         MOVE.L      #0,D0           * Limpia D0
@@ -573,7 +573,7 @@ LINB_RN:
         ADD.L       #1,D0           * Contador ++
         CMP.L       A1,A3           * Se comprueban los punteros despues de leer
         BNE         LINB_RFIN        * Si no son iguales se sale
-        LEA         buffSA,A1       * Si lo son, se resetea el puntero al principio
+        LEA         buffSB,A1       * Si lo son, se resetea el puntero al principio
 
 LINB_RFIN:
         CMP.B       #13,D1          * Caracter leido igual a retorono de carro?
@@ -664,7 +664,7 @@ TR_A:
 		CMP.L		#$FFFFFFFF,D0	* Si d0 = #$FFFFFFFF buffer vacio
 		BEQ 		FIN_TA			* Si error fin.
 		MOVE.B		D0,TBA			* Introducimos el caracter en la linea A de transmisión.	
-		CMP.B 		#13,D0
+		CMP.L 		#13,D0
         BNE         RTI_FIN
         MOVE.B      #1,LIN_TBA
 		BRA 		RTI_FIN			* Si son iguales hemos terminado
