@@ -941,13 +941,14 @@ PR31_BUC:
 	MOVE.L #0,D1
 	MOVE.B D1,(A1)+
     CMP.L  D3,D2
-    BGT    PR42_BUC
+    BGT    PR31_BUC
 	MOVE.L #$0D,D1
 	MOVE.B D1,(A1)+
-    MOVE.L psb,A2
+    MOVE.L	A1,pSBRTI
+    MOVE.L 	pSB,A2
     MOVE.L	#1,D0
-    MOVE.W #1901,-(A7) * Tama~no de escritura
-    MOVE.L 	D0,-(A7)
+    MOVE.W      #1901,-(A7) * Tama~no de escritura
+    MOVE.W 	#1,-(A7)
     MOVE.L	A2,-(A7)
     BSR 	SCAN
     BREAK
