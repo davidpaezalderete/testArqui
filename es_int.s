@@ -311,12 +311,12 @@ EB_RESC:
         MOVE.L		A2,pSBRTI		* Actualizo puntero
         CMP.L		A2,A3			* Miro si he llegado al final
         BNE         EB_RFIN         * Si no, salto
-        LEA         buffSB,A2		* Si he llegado al final llevo buffSA a A2 (buffer circular)
+        LEA         buffSB,A2		* Si he llegado al final llevo buffSB a A2 (buffer circular)
         MOVE.L		A2,pSBRTI		* Y actualizo puntero
 EB_RFIN:
         CMP.L		A1,A2			* Comparo punteros
         BEQ         E_FIN			* Si son iguales voy a E_FIN
-        MOVE.B		#0,emptySB		* Si no, pongo un 0 en emptySa
+        MOVE.B		#0,emptySB		* Si no, pongo un 0 en emptySB
         BRA         E_FIN			* Y salto a E_FIN
 
 EB_T:
