@@ -7,7 +7,7 @@
 
 	ORG	$0
 	DC.L	$8000		* Inicio de Pila
-	DC.L	PR31		* PC al inicio de PPAL1
+	DC.L	PR42		* PC al inicio de PPAL1
 
 ********* Definición de los registros *********************
 
@@ -846,7 +846,7 @@ PR39:
 	MOVE.L #$0D,D1
 	MOVE.B D1,(A1)+ 
 	MOVE.L A1,pSA
-    MOVE.W #10,-(A7) * Tama~no de escritura
+    	MOVE.W #10,-(A7) * Tama~no de escritura
 	MOVE.W #DESA,-(A7) * Puerto B
 	MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
@@ -887,7 +887,7 @@ PR42_BUC:
 	MOVE.L #$0D,D1
 	MOVE.B D1,(A1)+ 
 	MOVE.L A1,pSB
-    MOVE.W #10,-(A7) * Tama~no de escritura
+    MOVE.W #1901,-(A7) * Tama~no de escritura
 	MOVE.W #1,-(A7) * Puerto B
 	MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
