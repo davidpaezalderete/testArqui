@@ -955,6 +955,95 @@ PR31_BUC:
 
 
 
+PR52:
+    BSR INIT
+    MOVE.L pSB,A1
+    MOVE.L pSB,A2
+    * MOVE.L		#$FFFFFFFF,D0
+    MOVE.L #100,D2
+    MOVE.L #0,D3
+PR42_BUC:
+    ADD.L  #1,D3
+    MOVE.L #1,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #2,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #3,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #4,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #5,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #6,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #7,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #8,D1
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #9,D1	
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+	MOVE.L #0,D1	
+	MOVE.B D1,(A1)+
+    MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+    CMP.L  D3,D2
+    BGT    PR42_BUC
+	MOVE.L #$0D,D1
+	MOVE.B D1,(A1)+ 
+	MOVE.L A1,pSB
+    MOVE.W #1,-(A7) * Tama~no de escritura
+	MOVE.W #1,-(A7) * Puerto B
+	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    BSR PRINT
+    BREAK
 
 
 
