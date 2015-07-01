@@ -7,7 +7,7 @@
 
 	ORG	$0
 	DC.L	$8000		* Inicio de Pila
-	DC.L	PR42		* PC al inicio de PPAL1
+	DC.L	PR52		* PC al inicio de PPAL1
 
 ********* Definición de los registros *********************
 
@@ -959,89 +959,110 @@ PR52:
     BSR INIT
     MOVE.L pSB,A1
     MOVE.L pSB,A2
+    MOVE.L pSB,A6
     * MOVE.L		#$FFFFFFFF,D0
-    MOVE.L #100,D2
-    MOVE.L #0,D3
-PR42_BUC:
-    ADD.L  #1,D3
+    MOVE.L #100,D6
+    MOVE.L #0,D7
+PR52_BUC:
+    ADD.L  #1,D7
     MOVE.L #1,D1
-	MOVE.B D1,(A1)+
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #2,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #2,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #3,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #3,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #4,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #4,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #5,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #5,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #6,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #6,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #7,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #7,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #8,D1
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #8,D1
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #9,D1	
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #9,D1	
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-	MOVE.L #0,D1	
-	MOVE.B D1,(A1)+
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    MOVE.L #0,D1	
+    MOVE.B D1,(A1)+
     MOVE.L A1,pSB
     MOVE.W #1,-(A7) * Tama~no de escritura
-	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+    MOVE.W #1,-(A7) * Puerto B
+    MOVE.L A2,-(A7) * Direcci ́on de lectura
     BSR PRINT
-    CMP.L  D3,D2
-    BGT    PR42_BUC
+    MOVE.L pSB,A2
+    MOVE.L pSB,A1
+    CMP.L  D7,D6
+    BGT    PR52_BUC
 	MOVE.L #$0D,D1
 	MOVE.B D1,(A1)+ 
 	MOVE.L A1,pSB
-    MOVE.W #1,-(A7) * Tama~no de escritura
+    MOVE.W #1001,-(A7) * Tama~no de escritura
 	MOVE.W #1,-(A7) * Puerto B
-	MOVE.L A2,-(A7) * Direcci ́on de lectura
+	MOVE.L A6,-(A7) * Direcci ́on de lectura
     BSR PRINT
     BREAK
 
